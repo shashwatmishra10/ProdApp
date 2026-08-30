@@ -1,0 +1,150 @@
+// Minto data model.
+// Uses SQLite for zero-setup local/dev running; swap the datasource provider
+// to "postgresql" and point DATABASE_URL at a real Postgres instance for production.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime @default(now())
+
+  accounts             Account[]
+  transactions         Transaction[]
+  goals                Goal[]
+  budget               Budget?
+  notificationSettings NotificationSettings?
+  sharedGroups         SharedGroup[]
+  aaConnection         AAConnection?
+  gmailConnection      GmailConnection?
+}
+
+model Account {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  type        String // SAVINGS | CREDIT_CARD | CASH
+  provider    String   @default("MANUAL") // MANUAL | AA
+  balance     Float    @default(0)
+  currency    String   @default("INR")
+  externalRef String? // linked AA account reference, when provider = AA
+  createdAt   DateTime @default(now())
+
+  transactions Transaction[]
+
+  @@unique([userId, name])
+}
+
+model Transaction {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId    String?
+  account      Account?  @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  merchant     String
+  amount       Float
+  category     String
+  type         String // EXPENSE | INCOME | TRANSFER | REFUND
+  payment      String
+  date         DateTime
+  source       String // MANUAL | BANK | GMAIL | AA
+  notes        String?
+  recurring    Boolean   @default(false)
+  transferSide String? // IN | OUT, only set when type = TRANSFER
+  externalId   String? // dedupe key for AA/Gmail-imported transactions
+  createdAt    DateTime  @default(now())
+
+  @@index([userId, date])
+  @@unique([userId, externalId])
+}
+
+model Budget {
+  id         String @id @default(cuid())
+  userId     String @unique
+  user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  month      String
+  total      Float
+  categories String // JSON-encoded { [category]: limit }
+  rollover   Boolean @default(true)
+}
+
+model Goal {
+  id       String    @id @default(cuid())
+  userId   String
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name     String
+  target   Float
+  saved    Float     @default(0)
+  deadline DateTime?
+  icon     String?
+}
+
+model NotificationSettings {
+  id          String  @id @default(cuid())
+  userId      String  @unique
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lowBalance  Boolean @default(true)
+  budgetAlert Boolean @default(true)
+  recurring   Boolean @default(true)
+  unusual     Boolean @default(true)
+  settlement  Boolean @default(true)
+  sync        Boolean @default(true)
+}
+
+model SharedGroup {
+  id     String   @id @default(cuid())
+  userId String
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name   String
+  date   DateTime
+  status String   @default("OPEN") // OPEN | SETTLED
+
+  participants SharedParticipant[]
+}
+
+model SharedParticipant {
+  id      String      @id @default(cuid())
+  groupId String
+  group   SharedGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  name    String
+  share   Float
+  paid    Float       @default(0)
+  settled Boolean     @default(false)
+}
+
+// One real Account Aggregator consent/linkage per user (Setu AA-style flow).
+model AAConnection {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider       String   @default("mock") // "setu" | "mock"
+  consentHandle  String?
+  consentId      String?
+  status         String   @default("PENDING") // PENDING | ACTIVE | REVOKED | FAILED
+  linkedAccounts String? // JSON array of { linkRefNumber, fiType, maskedAccNumber }
+  lastSyncAt     DateTime?
+  createdAt      DateTime @default(now())
+}
+
+// One Gmail OAuth connection per user.
+model GmailConnection {
+  id           String    @id @default(cuid())
+  userId       String    @unique
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  email        String?
+  accessToken  String?
+  refreshToken String?
+  tokenExpiry  DateTime?
+  status       String    @default("DISCONNECTED") // CONNECTED | DISCONNECTED
+  lastSyncAt   DateTime?
+}
