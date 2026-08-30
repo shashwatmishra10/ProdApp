@@ -10,6 +10,21 @@ import { parseReceiptEmail } from "../integrations/gmail/parser";
 export const integrationsRouter = Router();
 integrationsRouter.use(requireAuth);
 
+// When the category heuristic can't confidently classify a narration/subject
+// (falls back to "Others"), check whether this exact merchant has already
+// been categorized for this user — manually, or from an earlier import — and
+// reuse that instead. This is what makes a merchant "learned" after the
+// first time it shows up, rather than re-guessed on every sync.
+async function resolveCategory(userId: string, merchant: string, guess: string): Promise<string> {
+  if (guess !== "Others") return guess;
+  const past = await prisma.transaction.findMany({
+    where: { userId, NOT: { category: "Others" } },
+    select: { merchant: true, category: true },
+  });
+  const match = past.find((p) => p.merchant.toLowerCase() === merchant.toLowerCase());
+  return match ? match.category : "Others";
+}
+
 // ---------------------------------------------------------------------------
 // Bank Account Aggregator
 // ---------------------------------------------------------------------------
@@ -58,7 +73,7 @@ async function importAAData(userId: string, consentId: string) {
         accountId,
         merchant: txn.narration,
         amount: txn.amount,
-        category: guessCategory(txn.narration),
+        category: await resolveCategory(userId, txn.narration, guessCategory(txn.narration)),
         type: txn.type === "CREDIT" ? "INCOME" : "EXPENSE",
         payment: "Bank transfer",
         date: new Date(txn.valueDate),
@@ -222,7 +237,7 @@ integrationsRouter.post("/gmail/sync", async (req: AuthedRequest, res) => {
         accountId: cashAccount.id,
         merchant: parsed.merchant,
         amount: parsed.amount,
-        category: parsed.category,
+        category: await resolveCategory(userId, parsed.merchant, parsed.category),
         type: parsed.type,
         payment: "UPI",
         date: new Date(parsed.date),

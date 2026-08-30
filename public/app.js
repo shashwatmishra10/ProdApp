@@ -181,12 +181,20 @@ document.querySelectorAll(".phone-nav button[data-page]").forEach((b) => b.addEv
 function userInitial() {
   return (state.user?.name || "?").trim()[0]?.toUpperCase() || "?";
 }
+function syncStatusHtml() {
+  const bankOn = state.integrations?.aa?.status === "ACTIVE";
+  const gmailOn = state.integrations?.gmail?.status === "CONNECTED";
+  if (bankOn && gmailOn) return `<span style="color:#07895f;font-weight:800">● Bank &amp; Gmail connected</span>`;
+  if (bankOn) return `<span style="color:#07895f;font-weight:800">● Bank connected</span>`;
+  if (gmailOn) return `<span style="color:#07895f;font-weight:800">● Gmail connected</span>`;
+  return `<span style="color:#94A3B8;font-weight:800">● Manual tracking</span>`;
+}
 function setGreeting() {
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
   const first = (state.user?.name || "there").split(" ")[0];
   document.getElementById("pageTitle").textContent = `${greeting}, ${first} 👋`;
-  document.getElementById("eyebrow").innerHTML = `<span style="color:#07895f;font-weight:800">● All synced</span>`;
+  document.getElementById("eyebrow").innerHTML = syncStatusHtml();
   document.getElementById("avatar").textContent = userInitial();
 }
 function tickClock() {
@@ -239,12 +247,15 @@ function renderHome() {
   document.getElementById("upcoming").innerHTML = recurring.length
     ? recurring.map((x) => `<div class="txn"><div class="ico">${brandIcon(x.merchant) || categoryIcon(x.category)}</div><div class="txn-info"><b>${escapeHtml(x.merchant)}</b><small>${escapeHtml(x.category)} · Expected ${formatDate(x.date)}</small></div><div class="txn-amt">${money(x.amount)}<br><span class="chip yellow">Expected</span></div></div>`).join("")
     : '<div class="muted">No upcoming recurring payments detected.</div>';
+
+  renderSharedMoney();
+  renderGoals();
 }
 
 // ---------------------------------------------------------------------------
 // Transactions
 // ---------------------------------------------------------------------------
-let txnFilters = { query: "", category: "ALL", account: "ALL", type: "ALL", date: "ALL" };
+let txnFilters = { query: "", category: "ALL", account: "ALL", type: "ALL", date: "ALL", dateFrom: "", dateTo: "" };
 function filteredTransactions() {
   const q = (txnFilters.query || "").toLowerCase();
   return state.transactions.filter((t) => {
@@ -254,6 +265,10 @@ function filteredTransactions() {
     if (txnFilters.account !== "ALL" && t.account !== txnFilters.account) return false;
     if (txnFilters.type !== "ALL" && t.type !== txnFilters.type) return false;
     if (txnFilters.date === "MONTH" && monthKey(t.date) !== currentMonthKey()) return false;
+    if (txnFilters.date === "CUSTOM") {
+      if (txnFilters.dateFrom && t.date < txnFilters.dateFrom) return false;
+      if (txnFilters.dateTo && t.date > txnFilters.dateTo) return false;
+    }
     return true;
   });
 }
@@ -268,7 +283,7 @@ function renderTransactions() {
     <div class="search-box"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="txnSearch" placeholder="Search merchant, category or note" value="${escapeHtml(txnFilters.query)}"></div>
     <div class="filter-row" style="margin-top:8px">${["ALL", "EXPENSE", "INCOME", "TRANSFER", "REFUND"].map((x) => `<button class="filter-pill ${txnFilters.type === x ? "active" : ""}" onclick="setTxnFilter('type','${x}')">${x === "ALL" ? "All" : x[0] + x.slice(1).toLowerCase()}</button>`).join("")}</div>
     <div class="filter-row" style="margin-top:7px">${["ALL", ...categories].map((x) => `<button class="filter-pill ${txnFilters.category === x ? "active" : ""}" onclick="setTxnFilter('category',${JSON.stringify(x)})">${escapeHtml(x === "ALL" ? "All categories" : x)}</button>`).join("")}</div>
-    <div class="filter-row" style="margin-top:7px"><button class="filter-pill ${txnFilters.date === "ALL" ? "active" : ""}" onclick="setTxnFilter('date','ALL')">All time</button><button class="filter-pill ${txnFilters.date === "MONTH" ? "active" : ""}" onclick="setTxnFilter('date','MONTH')">This month</button>${accounts.map((x) => `<button class="filter-pill ${txnFilters.account === x ? "active" : ""}" onclick="setTxnFilter('account',${JSON.stringify(x)})">${escapeHtml(x)}</button>`).join("")}</div>
+    <div class="filter-row" style="margin-top:7px"><button class="filter-pill ${txnFilters.date === "ALL" ? "active" : ""}" onclick="setTxnFilter('date','ALL')">All time</button><button class="filter-pill ${txnFilters.date === "MONTH" ? "active" : ""}" onclick="setTxnFilter('date','MONTH')">This month</button><button class="filter-pill ${txnFilters.date === "CUSTOM" ? "active" : ""}" onclick="openDateRangeFilter()"><svg viewBox="0 0 24 24" style="width:11px;height:11px;vertical-align:-1px;margin-right:3px"><rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 9h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>${txnFilters.date === "CUSTOM" ? customRangeLabel() : "Custom range"}</button>${accounts.map((x) => `<button class="filter-pill ${txnFilters.account === x ? "active" : ""}" onclick="setTxnFilter('account',${JSON.stringify(x)})">${escapeHtml(x)}</button>`).join("")}</div>
     <div class="export-row">
       <button class="btn secondary" onclick="openEmailExport()"><svg viewBox="0 0 24 24"><path d="M4 6h16v12H4zM4 6l8 7 8-7"/></svg>Email me a copy</button>
       <button class="btn secondary" onclick="clearTxnFilters()"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5"/></svg>Clear filters</button>
@@ -289,31 +304,67 @@ function renderTransactions() {
     : `<div class="empty-state"><div class="big">⌕</div><b>No transactions found</b><div style="margin-top:4px">Try changing your search or filters.</div></div>`;
 }
 function setTxnFilter(key, value) { txnFilters[key] = value; renderTransactions(); }
-function clearTxnFilters() { txnFilters = { query: "", category: "ALL", account: "ALL", type: "ALL", date: "ALL" }; renderTransactions(); }
-function buildTransactionsCsv() {
-  const rows = [["Date", "Merchant", "Type", "Category", "Amount", "Account", "Payment", "Source", "Recurring", "Notes"], ...filteredTransactions().map((t) => [t.date, t.merchant, t.type, t.category, t.amount, t.account, t.payment, t.source, t.recurring ? "Yes" : "No", t.notes || ""])];
+function customRangeLabel() {
+  const { dateFrom, dateTo } = txnFilters;
+  if (dateFrom && dateTo) return `${formatDate(dateFrom)} – ${formatDate(dateTo)}`;
+  if (dateFrom) return `From ${formatDate(dateFrom)}`;
+  if (dateTo) return `Until ${formatDate(dateTo)}`;
+  return "Custom range";
+}
+function clearTxnFilters() { txnFilters = { query: "", category: "ALL", account: "ALL", type: "ALL", date: "ALL", dateFrom: "", dateTo: "" }; renderTransactions(); }
+function openDateRangeFilter() {
+  openModal("Filter by date", `
+  <div class="formgrid">
+    <div class="field"><label>From</label><input id="rangeFrom" type="date" value="${txnFilters.dateFrom || ""}"></div>
+    <div class="field"><label>To</label><input id="rangeTo" type="date" value="${txnFilters.dateTo || ""}"></div>
+  </div>
+  <div class="action-row"><button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="applyDateRangeFilter()">Apply</button></div>`);
+}
+function applyDateRangeFilter() {
+  const from = document.getElementById("rangeFrom").value;
+  const to = document.getElementById("rangeTo").value;
+  if (!from && !to) { toast("Pick at least one date"); return; }
+  if (from && to && from > to) { toast("From date must be before to date"); return; }
+  txnFilters.date = "CUSTOM";
+  txnFilters.dateFrom = from;
+  txnFilters.dateTo = to;
+  closeModal();
+  renderTransactions();
+}
+function buildTransactionsCsv(fromDate, toDate) {
+  let rowsData = filteredTransactions();
+  if (fromDate) rowsData = rowsData.filter((t) => t.date >= fromDate);
+  if (toDate) rowsData = rowsData.filter((t) => t.date <= toDate);
+  const rows = [["Date", "Merchant", "Type", "Category", "Amount", "Account", "Payment", "Source", "Recurring", "Notes"], ...rowsData.map((t) => [t.date, t.merchant, t.type, t.category, t.amount, t.account, t.payment, t.source, t.recurring ? "Yes" : "No", t.notes || ""])];
   return rows.map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
 }
-function downloadCsv() {
-  const blob = new Blob([buildTransactionsCsv()], { type: "text/csv;charset=utf-8" }), url = URL.createObjectURL(blob), a = document.createElement("a");
+function downloadCsv(fromDate, toDate) {
+  const blob = new Blob([buildTransactionsCsv(fromDate, toDate)], { type: "text/csv;charset=utf-8" }), url = URL.createObjectURL(blob), a = document.createElement("a");
   a.href = url; a.download = "minto-transactions.csv"; a.click(); URL.revokeObjectURL(url);
 }
 function openEmailExport() {
   openModal("Email me a copy", `
-  <div class="muted" style="margin-bottom:10px">We'll send a CSV of your current transaction list (with any filters you've applied) to this address.</div>
-  <div class="field full"><label>Email address</label><input id="exportEmail" type="email" value="${escapeHtml(state.user?.email || "")}"></div>
+  <div class="muted" style="margin-bottom:10px">We'll send a CSV of your transactions (with any filters you've applied) to this address. Leave the dates blank to include everything.</div>
+  <div class="formgrid">
+    <div class="field full"><label>Email address</label><input id="exportEmail" type="email" value="${escapeHtml(state.user?.email || "")}"></div>
+    <div class="field"><label>From date</label><input id="exportFrom" type="date"></div>
+    <div class="field"><label>To date</label><input id="exportTo" type="date"></div>
+  </div>
   <div class="action-row"><button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="sendEmailExport()">Send</button></div>`);
 }
 async function sendEmailExport() {
   const email = document.getElementById("exportEmail").value.trim();
+  const fromDate = document.getElementById("exportFrom").value;
+  const toDate = document.getElementById("exportTo").value;
   if (!email) { toast("Enter an email address"); return; }
+  if (fromDate && toDate && fromDate > toDate) { toast("From date must be before to date"); return; }
   try {
-    await Api.emailExport(email, buildTransactionsCsv());
+    await Api.emailExport(email, buildTransactionsCsv(fromDate, toDate));
     closeModal();
     successToast(`✓ Sent to ${email}`);
   } catch (err) {
     closeModal();
-    downloadCsv();
+    downloadCsv(fromDate, toDate);
     toast(err.message.includes("not configured") ? "Email isn't set up yet — downloaded the CSV instead" : err.message);
   }
 }
@@ -432,13 +483,24 @@ async function toggleNotificationSetting(key, button) {
   await Api.patchNotifications({ [key]: state.notificationSettings[key] });
 }
 
+function goalIcon(emoji) {
+  const map = {
+    "🛟": svgWrap(`<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="9" fill="none" stroke="#2563EB" stroke-width="2"/><circle cx="16" cy="16" r="3" fill="none" stroke="#2563EB" stroke-width="2"/><path d="M16 7v6M16 19v6M7 16h6M19 16h6" stroke="#2563EB" stroke-width="2"/></svg>`, "#EFF6FF"),
+    "✈️": categoryIcon("Travel"),
+    "🚗": svgWrap(`<svg viewBox="0 0 32 32"><path d="M6 20l2-7a3 3 0 0 1 3-2h10a3 3 0 0 1 3 2l2 7" fill="none" stroke="#DB2777" stroke-width="2" stroke-linejoin="round"/><rect x="5" y="20" width="22" height="5" rx="2" fill="none" stroke="#DB2777" stroke-width="2"/><circle cx="10" cy="25" r="1.6" fill="#DB2777"/><circle cx="22" cy="25" r="1.6" fill="#DB2777"/></svg>`, "#FDF2F8"),
+    "🏠": categoryIcon("Rent"),
+    "🎓": categoryIcon("Education"),
+    "💻": svgWrap(`<svg viewBox="0 0 32 32"><rect x="6" y="8" width="20" height="13" rx="2" fill="none" stroke="#7C3AED" stroke-width="2"/><path d="M3 25h26l-2-4H5z" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linejoin="round"/></svg>`, "#F5F3FF"),
+  };
+  return map[emoji] || svgWrap(`<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="9" fill="none" stroke="#15803D" stroke-width="2"/><circle cx="16" cy="16" r="5" fill="none" stroke="#15803D" stroke-width="2"/><circle cx="16" cy="16" r="1.6" fill="#15803D"/></svg>`, "#F0FDF4");
+}
 function renderGoals() {
   const goalsEl = document.getElementById("goalsCard");
   if (goalsEl) goalsEl.innerHTML = state.goals.length ? state.goals.map((g) => {
     const pct = Math.min(100, Math.round((Number(g.saved) / Math.max(1, Number(g.target))) * 100));
     const left = Math.max(0, Number(g.target) - Number(g.saved));
     return `<div class="goal">
-      <div class="goal-head"><div class="goal-icon">${escapeHtml(g.icon || "🎯")}</div><div class="grow"><b>${escapeHtml(g.name)}</b><div class="muted">${money(g.saved)} of ${money(g.target)} · ${pct}%</div></div><b>${money(left)}</b></div>
+      <div class="goal-head"><div class="goal-icon">${goalIcon(g.icon)}</div><div class="grow"><b>${escapeHtml(g.name)}</b><div class="muted">${money(g.saved)} of ${money(g.target)} · ${pct}%</div></div><b>${money(left)}</b></div>
       <div class="goal-progress"><span style="width:${pct}%"></span></div>
       <div class="goal-actions"><button class="btn secondary" onclick="addToGoal('${g.id}')">Add money</button><button class="btn secondary" onclick="editGoal('${g.id}')">Edit</button><button class="btn secondary danger" onclick="deleteGoal('${g.id}')">Delete</button></div>
     </div>`;
@@ -456,7 +518,15 @@ function openGoalManager(id) {
    <div class="field"><label>Target amount</label><input id="goalTarget" type="number" min="1" value="${g?.target || 50000}"></div>
    <div class="field"><label>Already saved</label><input id="goalSaved" type="number" min="0" value="${g?.saved || 0}"></div>
    <div class="field"><label>Target date</label><input id="goalDate" type="date" value="${g?.deadline || ""}"></div>
-   <div class="field"><label>Icon</label><select id="goalIcon"><option${g?.icon === "🛟" ? " selected" : ""}>🛟</option><option${g?.icon === "✈️" ? " selected" : ""}>✈️</option><option${g?.icon === "🚗" ? " selected" : ""}>🚗</option><option${g?.icon === "🏠" ? " selected" : ""}>🏠</option><option${g?.icon === "🎓" ? " selected" : ""}>🎓</option><option${g?.icon === "💻" ? " selected" : ""}>💻</option><option${!g || g?.icon === "🎯" ? " selected" : ""}>🎯</option></select></div>
+   <div class="field"><label>Icon</label><select id="goalIcon">
+     <option value="🛟"${g?.icon === "🛟" ? " selected" : ""}>🛟 Emergency fund</option>
+     <option value="✈️"${g?.icon === "✈️" ? " selected" : ""}>✈️ Travel</option>
+     <option value="🚗"${g?.icon === "🚗" ? " selected" : ""}>🚗 Vehicle</option>
+     <option value="🏠"${g?.icon === "🏠" ? " selected" : ""}>🏠 Home</option>
+     <option value="🎓"${g?.icon === "🎓" ? " selected" : ""}>🎓 Education</option>
+     <option value="💻"${g?.icon === "💻" ? " selected" : ""}>💻 Tech</option>
+     <option value="🎯"${!g || g?.icon === "🎯" ? " selected" : ""}>🎯 General</option>
+   </select></div>
    <div class="full action-row"><button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveGoal('${id || ""}')">Save goal</button></div>
   </div>`);
 }
@@ -534,20 +604,21 @@ function renderCategoryChart() {
     <div class="chart-legend">${legend}</div>`;
 }
 
-function renderInsights() {
-  renderNotifications();
-  renderSmartInsights();
-  renderGoals();
-  renderCategoryChart();
-
+function renderSharedMoney() {
   const shared = sharedSummary();
   const sharedEl = document.getElementById("sharedMoney");
   if (sharedEl) sharedEl.innerHTML = `
     <div class="grid g2" style="gap:10px;margin-bottom:10px">
-      <div style="background:#ECFEF7;padding:13px;border-radius:14px"><div class="muted">Owed to you</div><b style="font-size:20px;color:#15803D">${money(shared.owed)}</b></div>
-      <div style="background:#FFF7ED;padding:13px;border-radius:14px"><div class="muted">You owe</div><b style="font-size:20px;color:#C2410C">${money(shared.youOwe)}</b></div>
+      <div style="background:#ECFEF7;padding:13px;border-radius:14px"><div class="muted">Owed to you</div><b style="font-size:var(--fs-2xl);color:#15803D">${money(shared.owed)}</b></div>
+      <div style="background:#FFF7ED;padding:13px;border-radius:14px"><div class="muted">You owe</div><b style="font-size:var(--fs-2xl);color:#C2410C">${money(shared.youOwe)}</b></div>
     </div>
     ${shared.groups.length ? shared.groups.map((g) => { const bal = groupBalance(g); return `<div class="txn"><div class="ico">👥</div><div class="txn-info"><b>${escapeHtml(g.name)}</b><small>${formatDate(g.date)} · ${g.participants.length} people</small></div><div class="txn-amt">${bal.owedToYou ? `+${money(bal.owedToYou)}` : `-${money(bal.youOwe)}`}<br>${g.status === "OPEN" ? `<button class="link" onclick="settleGroup('${g.id}')">Settle</button>` : '<span class="chip green">Settled</span>'}</div></div>`; }).join("") : '<div class="muted">No shared expenses yet.</div>'}`;
+}
+
+function renderInsights() {
+  renderNotifications();
+  renderSmartInsights();
+  renderCategoryChart();
 
   const bt = totals();
   const bmEl = document.getElementById("budgetManager");
@@ -590,7 +661,7 @@ function renderInsights() {
 async function settleGroup(id) {
   await Api.settleSharedGroup(id);
   await refreshState();
-  renderInsights(); renderHome(); toast("Expense marked as settled");
+  renderHome(); toast("Expense marked as settled");
 }
 
 // ---------------------------------------------------------------------------
@@ -624,7 +695,7 @@ function openAccount(name) {
   openModal(name, `
     <div class="account-detail-hero">
       <div class="muted">${isCredit ? "Current outstanding" : "Available balance"}</div>
-      <div style="font-size:31px;font-weight:900;margin-top:5px">${money(Math.abs(balance))}</div>
+      <div style="font-size:var(--fs-hero);font-weight:900;margin-top:5px">${money(Math.abs(balance))}</div>
       <div class="muted" style="margin-top:7px">${isCredit ? "Credit card balance" : "Connected account"}</div>
     </div>
     <div class="detail-grid">
@@ -643,7 +714,7 @@ async function renderIntegrationStatus() {
   const aaChip = document.getElementById("aaChip"), aaRow = document.getElementById("aaActionRow");
   try {
     const gmail = await Api.gmailStatus();
-    if (!gmail.configured) { gmailChip.className = "chip yellow"; gmailChip.textContent = "Not configured"; gmailRow.innerHTML = '<div class="muted" style="font-size:11px">Set GOOGLE_CLIENT_ID / SECRET in .env to enable.</div>'; }
+    if (!gmail.configured) { gmailChip.className = "chip yellow"; gmailChip.textContent = "Not configured"; gmailRow.innerHTML = '<div class="muted" style="font-size:var(--fs-sm)">Set GOOGLE_CLIENT_ID / SECRET in .env to enable.</div>'; }
     else if (gmail.status === "CONNECTED") { gmailChip.className = "chip green"; gmailChip.textContent = "Connected"; gmailRow.innerHTML = `<button class="btn secondary" onclick="gmailSync()">Sync now</button><button class="btn secondary danger" onclick="gmailDisconnect()">Disconnect</button>`; }
     else { gmailChip.className = "chip"; gmailChip.textContent = "Not connected"; gmailRow.innerHTML = `<button class="btn primary" onclick="gmailConnect()">Connect Gmail</button>`; }
   } catch { gmailChip.textContent = "Error"; }
@@ -734,7 +805,7 @@ function renderSplitPeopleChips() {
   if (!el) return;
   el.innerHTML = splitPeopleList.length
     ? splitPeopleList.map((name, i) => `<span class="split-chip">${escapeHtml(name)}<button type="button" onclick="removeSplitPerson(${i})" aria-label="Remove ${escapeHtml(name)}">×</button></span>`).join("")
-    : '<span class="muted" style="font-size:11px">No one added yet</span>';
+    : '<span class="muted" style="font-size:var(--fs-sm)">No one added yet</span>';
 }
 function updateSplitPreview() {
   const total = Number(document.getElementById("splitAmt")?.value) || 0;
@@ -782,7 +853,7 @@ function openBudgetManager() {
   <div style="max-height:390px;overflow:auto;padding-right:2px">
   ${cats.map((c) => `<div class="field" style="margin:8px 0"><label>${escapeHtml(c)}</label><input class="budget-input" data-cat="${escapeHtml(c)}" type="number" min="0" value="${Number(state.budget.categories[c] || 0)}"></div>`).join("")}
   </div>
-  <div style="display:flex;align-items:center;gap:8px;margin:12px 0"><input id="budgetRollover" type="checkbox" ${state.budget.rollover ? "checked" : ""} style="width:auto"><label for="budgetRollover" style="font-size:12px;font-weight:700">Carry unused category budget forward</label></div>
+  <div style="display:flex;align-items:center;gap:8px;margin:12px 0"><input id="budgetRollover" type="checkbox" ${state.budget.rollover ? "checked" : ""} style="width:auto"><label for="budgetRollover" style="font-size:var(--fs-base);font-weight:700">Carry unused category budget forward</label></div>
   <div class="action-row"><button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveBudgetManager()">Save budget</button></div>`);
 }
 async function saveBudgetManager() {
@@ -800,8 +871,8 @@ async function saveBudgetManager() {
 // ---------------------------------------------------------------------------
 function openModal(title, body) { document.getElementById("modalTitle").textContent = title; document.getElementById("modalBody").innerHTML = body; document.getElementById("modal").classList.add("open"); }
 function closeModal() { document.getElementById("modal").classList.remove("open"); }
-function toast(msg) { const e = document.createElement("div"); e.className = "toast"; e.textContent = msg; document.body.appendChild(e); setTimeout(() => e.remove(), 2200); }
-function successToast(msg) { const e = document.createElement("div"); e.className = "toast toast-success"; e.textContent = msg; document.body.appendChild(e); setTimeout(() => e.remove(), 2000); }
+function toast(msg) { const e = document.createElement("div"); e.className = "toast"; e.textContent = msg; document.querySelector(".main").appendChild(e); setTimeout(() => e.remove(), 2200); }
+function successToast(msg) { const e = document.createElement("div"); e.className = "toast toast-success"; e.textContent = msg; document.querySelector(".main").appendChild(e); setTimeout(() => e.remove(), 2000); }
 
 // ---------------------------------------------------------------------------
 // Boot
