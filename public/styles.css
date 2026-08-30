@@ -33,10 +33,12 @@ button,input,select{font:inherit}button{cursor:pointer}
 .card{background:white;border:1px solid var(--line);border-radius:var(--radius);padding:19px;box-shadow:var(--shadow)}
 .balance{background:linear-gradient(145deg,#0F172A,#16243A);color:white;border:0}.balance .muted{color:#CBD5E1}
 .muted{font-size:12px;color:var(--muted)}.amount{font-size:29px;font-weight:880;letter-spacing:-1.2px;margin-top:7px}.stat{font-size:22px;font-weight:850;margin-top:7px}.positive{color:#16A34A}.negative{color:var(--danger)}
-.section-title{display:flex;align-items:center;justify-content:space-between;margin:26px 0 11px}.section-title h2{font-size:16px;margin:0;letter-spacing:-.2px}.link{background:none;color:#079669;font-weight:800;font-size:12px}
+.section-title{display:flex;align-items:center;justify-content:space-between;margin:26px 0 11px}.section-title h2{font-size:16px;margin:0;letter-spacing:-.2px}
+.link{background:var(--mint);color:#079669;font-weight:800;font-size:11px;padding:6px 11px;border-radius:999px;display:inline-flex;align-items:center;gap:4px;transition:background .15s}
+.link:hover{background:#D3F8E4}
+.link:after{content:"→";font-size:11px;line-height:1}
 .progress{height:8px;background:#E8EEF2;border-radius:99px;overflow:hidden;margin:11px 0}.progress span{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--teal));border-radius:99px}
 .chip{display:inline-flex;align-items:center;border-radius:999px;padding:5px 9px;background:#F1F5F9;color:#475569;font-size:10px;font-weight:800}.chip.green{background:var(--mint);color:#07895f}.chip.purple{background:#F5F3FF;color:#7650D8}.chip.yellow{background:#FFF9E8;color:#A16207}
-.balance-card-row{display:flex;align-items:end;justify-content:space-between}
 .categories .cat{display:flex;align-items:center;gap:10px;margin:13px 0}.ico{width:38px;height:38px;border-radius:12px;background:#F8FAFC;display:grid;place-items:center;flex:none;border:1px solid #EEF2F5;overflow:hidden}.merchant-logo{width:100%;height:100%;display:grid;place-items:center}.merchant-logo svg{width:25px;height:25px;display:block}.cat-name{width:82px;font-size:12px;font-weight:750}.bar{flex:1;height:7px;background:#F1F5F9;border-radius:99px;overflow:hidden}.bar span{display:block;height:100%;background:var(--teal);border-radius:99px}.cat-val{width:62px;text-align:right;font-size:11px;font-weight:750}
 .insight{background:linear-gradient(135deg,#FAF8FF,#FFF);border-color:#E5DFFF}.insight .tag{font-size:10px;color:#7351D8;font-weight:850;letter-spacing:.6px}.insight h3{font-size:17px;margin:8px 0 5px;letter-spacing:-.3px}.insight p{font-size:12px;line-height:1.5;color:#475569;margin:0 0 14px}
 .btn{border:0;border-radius:11px;padding:10px 14px;font-weight:800;font-size:12px}.primary{background:var(--green);color:white}.secondary{background:white;color:var(--navy);border:1px solid var(--line)}.soft{background:var(--mint);color:#07895f}.purple-btn{background:#F5F3FF;color:#7351D8;border:1px solid #E5DFFF}
@@ -82,13 +84,10 @@ button,input,select{font:inherit}button{cursor:pointer}
 .budget-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
 .budget-kpi{padding:12px;border-radius:14px;background:#F8FAFC}.budget-kpi b{display:block;font-size:18px;margin-top:3px}
 .alert-card{background:#FFFBEB;border-color:#FDE68A}.over-card{background:#FEF2F2;border-color:#FECACA}
-.cashflow-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.cashflow-kpi{padding:14px;border-radius:15px;background:#F8FAFC}.cashflow-kpi b{display:block;font-size:20px;margin-top:4px}
 .goal{padding:13px 0;border-bottom:1px solid #F1F5F9}.goal:last-child{border-bottom:0}
 .goal-head{display:flex;align-items:center;gap:10px}.goal-icon{width:38px;height:38px;border-radius:12px;background:#ECFDF5;display:grid;place-items:center;font-size:19px}
 .goal .grow{flex:1}.goal-progress{height:8px;background:#E2E8F0;border-radius:99px;overflow:hidden;margin-top:9px}.goal-progress span{height:100%;display:block;background:var(--green);border-radius:99px}
 .goal-actions{display:flex;gap:7px;margin-top:9px}.goal-actions button{font-size:10px;padding:7px 10px}
-.savings-callout{background:linear-gradient(135deg,#ECFDF5,#F0FDFA);border:1px solid #BBF7D0}
 .insight{display:flex;gap:11px;align-items:flex-start;padding:13px 0;border-bottom:1px solid #F1F5F9}.insight:last-child{border-bottom:0}
 .insight-icon{width:36px;height:36px;border-radius:12px;background:#ECFDF5;display:grid;place-items:center;flex:0 0 36px}
 .insight .grow{flex:1}.insight b{font-size:13px}.insight p{margin:4px 0 0;font-size:11px;line-height:1.45;color:#64748B}
@@ -97,7 +96,9 @@ button,input,select{font:inherit}button{cursor:pointer}
 .filter-pill{border:1px solid #E2E8F0;background:white;border-radius:999px;padding:7px 11px;font-size:10px;font-weight:800;color:#475569;white-space:nowrap}.filter-pill.active{background:#ECFDF5;color:#087F5B;border-color:#BBF7D0}
 .search-box{position:relative}.search-box svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:17px;stroke:#94A3B8;fill:none;stroke-width:2}.search-box input{padding-left:36px}
 .txn-date-label{font-size:10px;font-weight:850;color:#94A3B8;text-transform:uppercase;letter-spacing:.5px;margin:16px 0 5px}
-.export-row{display:flex;gap:8px;margin-top:12px}.export-row button{flex:1}
+.export-row{display:flex;gap:8px;margin-top:12px}
+.export-row button{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.export-row svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .empty-state{text-align:center;padding:35px 15px;color:#64748B}.empty-state .big{font-size:28px;margin-bottom:7px}
 .alert-list{display:flex;flex-direction:column}.alert-item{display:flex;gap:10px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #F1F5F9}.alert-item:last-child{border-bottom:0}
 .alert-icon{width:36px;height:36px;border-radius:12px;background:#ECFDF5;display:grid;place-items:center;flex:0 0 36px;font-weight:900}.alert-icon.warn{background:#FFFBEB;color:#B45309}.alert-icon.danger{background:#FEF2F2;color:#DC2626}.alert-icon.info{background:#EFF6FF;color:#2563EB}

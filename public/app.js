@@ -129,13 +129,6 @@ function monthComparisonText() {
   return delta === 0 ? "Same as last month" : `${delta > 0 ? "↑" : "↓"} ${Math.abs(delta)}% ${delta > 0 ? "higher" : "lower"} than last month`;
 }
 
-function cashFlow() {
-  const t = totals();
-  const savings = Math.max(0, t.income - t.spending);
-  const savingsRate = t.income ? savings / t.income : 0;
-  return { income: t.income, spending: t.spending, savings, savingsRate };
-}
-
 function smartInsights() {
   const out = [];
   const t = totals();
@@ -198,10 +191,14 @@ function tickClock() {
 // ---------------------------------------------------------------------------
 // Home
 // ---------------------------------------------------------------------------
+function updateNotifDot() {
+  document.getElementById("notifDot").hidden = notificationData().length === 0;
+}
 function renderHome() {
+  updateNotifDot();
   const t = totals();
   const pct = t.budget ? Math.max(0, Math.min(100, Math.round(t.usage * 100))) : 0;
-  document.getElementById("balance").textContent = money(availableBalance());
+  document.getElementById("balance").textContent = money(Math.max(0, availableBalance()));
   document.getElementById("monthSpend").textContent = money(t.spending);
   document.getElementById("monthComparison").textContent = monthComparisonText();
   document.getElementById("budgetPct").textContent = pct + "%";
@@ -263,7 +260,10 @@ function renderTransactions() {
     <div class="filter-row" style="margin-top:8px">${["ALL", "EXPENSE", "INCOME", "TRANSFER", "REFUND"].map((x) => `<button class="filter-pill ${txnFilters.type === x ? "active" : ""}" onclick="setTxnFilter('type','${x}')">${x === "ALL" ? "All" : x[0] + x.slice(1).toLowerCase()}</button>`).join("")}</div>
     <div class="filter-row" style="margin-top:7px">${["ALL", ...categories].map((x) => `<button class="filter-pill ${txnFilters.category === x ? "active" : ""}" onclick="setTxnFilter('category',${JSON.stringify(x)})">${escapeHtml(x === "ALL" ? "All categories" : x)}</button>`).join("")}</div>
     <div class="filter-row" style="margin-top:7px"><button class="filter-pill ${txnFilters.date === "ALL" ? "active" : ""}" onclick="setTxnFilter('date','ALL')">All time</button><button class="filter-pill ${txnFilters.date === "MONTH" ? "active" : ""}" onclick="setTxnFilter('date','MONTH')">This month</button>${accounts.map((x) => `<button class="filter-pill ${txnFilters.account === x ? "active" : ""}" onclick="setTxnFilter('account',${JSON.stringify(x)})">${escapeHtml(x)}</button>`).join("")}</div>
-    <div class="export-row"><button class="secondary" onclick="exportCSV()">Export CSV</button><button class="secondary" onclick="clearTxnFilters()">Clear filters</button></div>`;
+    <div class="export-row">
+      <button class="btn secondary" onclick="exportCSV()"><svg viewBox="0 0 24 24"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 17v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2"/></svg>Export CSV</button>
+      <button class="btn secondary" onclick="clearTxnFilters()"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5"/></svg>Clear filters</button>
+    </div>`;
 
   const searchInput = document.getElementById("txnSearch");
   if (searchInput) searchInput.oninput = (e) => { txnFilters.query = e.target.value; renderTransactions(); const x = document.getElementById("txnSearch"); if (x) { x.focus(); x.setSelectionRange(x.value.length, x.value.length); } };
@@ -378,20 +378,6 @@ async function toggleNotificationSetting(key, button) {
 }
 
 function renderGoals() {
-  const cf = cashFlow();
-  const cfEl = document.getElementById("cashFlowCard");
-  if (cfEl) cfEl.innerHTML = `
-    <div class="cashflow-grid">
-      <div class="cashflow-kpi"><span class="muted">Income</span><b>${money(cf.income)}</b></div>
-      <div class="cashflow-kpi"><span class="muted">Spending</span><b>${money(cf.spending)}</b></div>
-      <div class="cashflow-kpi"><span class="muted">Net savings</span><b style="color:#15803D">${money(cf.savings)}</b></div>
-      <div class="cashflow-kpi"><span class="muted">Savings rate</span><b>${Math.round(cf.savingsRate * 100)}%</b></div>
-    </div>
-    <div class="savings-callout" style="padding:12px;margin-top:10px">
-      <b>${cf.savings >= 0 ? "You're saving this month" : "Spending is above income"}</b>
-      <div class="muted">${cf.savings >= 0 ? `You retained ${money(cf.savings)} after recorded spending.` : `Your recorded spending exceeds income by ${money(Math.abs(cf.savings))}.`}</div>
-    </div>`;
-
   const goalsEl = document.getElementById("goalsCard");
   if (goalsEl) goalsEl.innerHTML = state.goals.length ? state.goals.map((g) => {
     const pct = Math.min(100, Math.round((Number(g.saved) / Math.max(1, Number(g.target))) * 100));

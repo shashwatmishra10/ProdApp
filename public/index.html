@@ -14,14 +14,14 @@
 <div class="topbar">
       <div><div class="eyebrow" id="eyebrow"></div><h1 id="pageTitle">Hi 👋</h1></div>
       <div style="display:flex;align-items:center;gap:8px">
-        <button class="header-icon" onclick="go('insights')"><svg viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><i></i></button>
+        <button class="header-icon" onclick="go('insights')"><svg viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><i id="notifDot" hidden></i></button>
         <div class="avatar" id="avatar">•</div>
       </div>
     </div>
 
 <section class="page active" id="home">
   <div class="grid g4">
-    <div class="card balance"><div class="muted">Available balance</div><div class="balance-card-row"><div class="amount" id="balance">₹0</div><span class="chip" style="background:rgba(255,255,255,.1);color:#D9FBE8">Healthy</span></div><div class="muted" style="margin-top:5px">Across your connected accounts</div></div>
+    <div class="card balance"><div class="muted">Available balance</div><div class="amount" id="balance">₹0</div><div class="muted" style="margin-top:5px">Across your connected accounts</div></div>
     <div class="card"><div class="muted">Spent this month</div><div class="stat" id="monthSpend">₹0</div><div class="muted" id="monthComparison" style="font-size:11px;margin-top:6px"></div></div>
     <div class="card"><div class="muted">Monthly budget</div><div class="stat" id="budgetPct">0%</div><div class="muted"><span id="budgetSpent">₹0</span> of <span id="budgetTotalLabel">₹0</span></div></div>
     <div class="card"><div class="muted">Owed to you</div><div class="stat positive" id="owed">₹0</div><div class="muted">from shared expenses</div></div>
@@ -87,8 +87,6 @@
 <div class="card" id="sharedMoney"></div>
 <div class="section-title"><h2>Notifications</h2><button class="primary" onclick="openNotificationSettings()">Manage</button></div><div class="card" id="notificationsCard"></div><div class="section-title"><h2>Smart insights</h2><span class="chip green">Based on your data</span></div>
 <div class="card" id="smartInsights"></div>
-<div class="section-title"><h2>Cash flow</h2><span class="chip green">This month</span></div>
-<div class="card" id="cashFlowCard"></div>
 <div class="section-title"><h2>Savings goals</h2><button class="primary" onclick="openGoalManager()">Add goal</button></div>
 <div class="card" id="goalsCard"></div>
 </section>
