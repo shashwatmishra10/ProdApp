@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#22C55E">
+<title>Log in • Minto</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="logo">M</div>
+    <h1>Welcome back</h1>
+    <p class="sub">Log in to your Minto account</p>
+    <div class="auth-error" id="error"></div>
+    <form id="loginForm">
+      <div class="auth-field"><label>Email</label><input type="email" id="email" required autocomplete="email"></div>
+      <div class="auth-field"><label>Password</label><input type="password" id="password" required autocomplete="current-password"></div>
+      <button class="auth-submit" type="submit">Log in</button>
+    </form>
+    <div class="auth-switch">New to Minto? <a href="/signup.html">Create an account</a></div>
+  </div>
+</div>
+<script>
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const errorEl = document.getElementById("error");
+  errorEl.style.display = "none";
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  try {
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ email, password }),
+    });
+    const body = await res.json();
+    if (!res.ok) throw new Error(body.error || "Login failed");
+    window.location.href = "/";
+  } catch (err) {
+    errorEl.textContent = err.message;
+    errorEl.style.display = "block";
+  }
+});
+</script>
+</body>
+</html>

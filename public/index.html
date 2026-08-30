@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#22C55E">
+<title>Minto • Your personal money companion</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="app"><main class="main">
+<div class="phone-status"><span id="clock">9:41</span><span>● ◔ ▰</span></div>
+<div class="screen-content">
+<div class="topbar">
+      <div><div class="eyebrow" id="eyebrow"></div><h1 id="pageTitle">Hi 👋</h1></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="header-icon" onclick="go('insights')"><svg viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><i></i></button>
+        <div class="avatar" id="avatar">•</div>
+      </div>
+    </div>
+
+<section class="page active" id="home">
+  <div class="grid g4">
+    <div class="card balance"><div class="muted">Available balance</div><div class="balance-card-row"><div class="amount" id="balance">₹0</div><span class="chip" style="background:rgba(255,255,255,.1);color:#D9FBE8">Healthy</span></div><div class="muted" style="margin-top:5px">Across your connected accounts</div></div>
+    <div class="card"><div class="muted">Spent this month</div><div class="stat" id="monthSpend">₹0</div><div class="muted" id="monthComparison" style="font-size:11px;margin-top:6px"></div></div>
+    <div class="card"><div class="muted">Monthly budget</div><div class="stat" id="budgetPct">0%</div><div class="muted"><span id="budgetSpent">₹0</span> of <span id="budgetTotalLabel">₹0</span></div></div>
+    <div class="card"><div class="muted">Owed to you</div><div class="stat positive" id="owed">₹0</div><div class="muted">from shared expenses</div></div>
+  </div>
+
+  <div class="section-title"><h2>Monthly budget</h2><span class="chip yellow" id="budgetStatusChip">On track</span></div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between"><b id="budgetSpent2">₹0 spent</b><span class="muted" id="budgetTotalLabel2">₹0 budget</span></div>
+    <div class="progress"><span id="budgetBar" style="width:0%"></span></div>
+    <div class="muted" id="budgetRemaining"></div>
+  </div>
+
+  <div class="section-title"><h2>Spending snapshot</h2><button class="link" onclick="go('transactions')">View all</button></div>
+  <div class="grid g2">
+    <div class="card categories" id="categories"></div>
+    <div class="card insight"><div class="tag">✦ MINTO NOTICED</div><h3 id="insightHeadline">Keep tracking to unlock insights.</h3><p id="insightBody">Add a few transactions and Minto will start noticing patterns in your spending.</p><button class="btn secondary" onclick="go('insights')">See why</button></div>
+  </div>
+
+  <div class="section-title"><h2>Upcoming</h2><button class="link" onclick="go('insights')">See forecast</button></div>
+  <div class="card" id="upcoming"></div>
+</section>
+
+<section class="page" id="transactions">
+  <div class="toolbar"><input class="search" id="search" placeholder="Search merchant, category or notes..." oninput="renderTransactions()"><button class="btn primary" onclick="go('add')">＋ Add expense</button></div>
+  <div id="transactionFilters" class="card" style="margin-bottom:10px;padding:12px"></div><div class="card" id="transactionList"></div>
+</section>
+
+<section class="page" id="add">
+  <div class="card">
+    <div class="section-title" style="margin-top:0"><h2>Add transaction</h2><span class="chip green">Fast entry</span></div>
+    <div class="tabs"><button class="active" onclick="setType(this,'EXPENSE')">Expense</button><button onclick="setType(this,'INCOME')">Income</button><button onclick="setType(this,'TRANSFER')">Transfer</button></div>
+    <form class="formgrid" id="expenseForm">
+      <div class="field full"><label>Amount</label><input id="amount" type="number" min="1" placeholder="₹ 0" required></div>
+      <div class="field"><label>Merchant / description</label><input id="merchant" placeholder="e.g. Swiggy" required></div>
+      <div class="field"><label>Category</label><select id="category"><option>Food</option><option>Travel</option><option>Shopping</option><option>Groceries</option><option>Subscriptions</option><option>Bills</option><option>Rent</option><option>Entertainment</option><option>Health</option><option>Education</option><option>Others</option></select></div>
+      <div class="field"><label>Account</label><select id="account"><option>Cash</option><option>HDFC Savings</option><option>ICICI Savings</option><option>Axis Credit Card</option></select></div><div class="field" id="toAccountWrap" style="display:none"><label>Transfer to</label><select id="toAccount"><option>HDFC Savings</option><option>ICICI Savings</option><option>Cash</option><option>Axis Credit Card</option></select></div>
+      <div class="field"><label>Payment method</label><select id="payment"><option>UPI</option><option>Card</option><option>Cash</option><option>Bank transfer</option></select></div>
+      <div class="field"><label>Date</label><input id="date" type="date"></div>
+      <div class="field full"><label>Notes (optional)</label><input id="notes" placeholder="Anything you want to remember"></div><div class="full" style="display:flex;align-items:center;gap:8px"><input id="makeRecurring" type="checkbox" style="width:auto"><label for="makeRecurring" style="margin:0;font-size:12px;color:#475569;font-weight:700">Mark as recurring</label></div>
+      <div class="full" style="display:flex;gap:8px;justify-content:flex-end"><button type="button" class="btn secondary" onclick="resetForm()">Clear</button><button class="btn primary">Save transaction</button></div>
+    </form>
+  </div>
+  <div class="grid g3" style="margin-top:16px">
+    <div class="card" style="cursor:pointer" onclick="openReceipt()"><div style="font-size:25px">🧾</div><h3 style="margin:8px 0 4px;font-size:15px">Scan receipt</h3><div class="muted">Extract merchant, amount and category.</div></div>
+    <div class="card" style="cursor:pointer" onclick="openSplit()"><div style="font-size:25px">👥</div><h3 style="margin:8px 0 4px;font-size:15px">Split expense</h3><div class="muted">Split a bill with friends.</div></div>
+    <div class="card" style="cursor:pointer" onclick="go('insights')"><div style="font-size:25px">✦</div><h3 style="margin:8px 0 4px;font-size:15px">Smart insights</h3><div class="muted">See what Minto noticed.</div></div>
+  </div>
+</section>
+
+<section class="page" id="insights">
+  <div class="stat-grid">
+    <div class="card"><div class="muted">Expected monthly spending</div><div class="amount" id="forecastAmount">₹0</div><span class="chip green" id="forecastChip">Within budget</span></div>
+    <div class="card"><div class="muted">Recurring commitments</div><div class="amount" id="recurringAmount">₹0</div><div class="muted" id="recurringCount">No detected payments</div></div>
+    <div class="card"><div class="muted">Savings goal progress</div><div class="amount" id="goalPct">0%</div><div class="muted" id="goalPctName">No goals yet</div></div>
+  </div>
+  <div class="section-title"><h2>Minto insights</h2><span class="chip purple">AI powered</span></div>
+  <div class="section-title"><h2>Budget manager</h2><button class="primary" onclick="openBudgetManager()">Edit budget</button></div>
+<div class="card" id="budgetManager"></div>
+<div class="section-title"><h2>Recurring expenses</h2></div><div class="card" id="recurring"></div>
+  <div class="section-title"><h2>Upcoming expense forecast</h2></div>
+  <div class="card"><div style="display:flex;justify-content:space-between;gap:15px"><div><b>Expected spending this month</b><div class="muted">Based on your history and recurring commitments</div></div><strong style="font-size:21px" id="forecastAmount2">₹0</strong></div><div class="progress"><span id="forecastBar" style="width:0%"></span></div><div class="muted">Forecast uses your recent spending pace and detected recurring payments. It is an estimate, not a guarantee.</div></div>
+  <div class="section-title"><h2>Shared money</h2><span class="chip green">Live balance</span></div>
+<div class="card" id="sharedMoney"></div>
+<div class="section-title"><h2>Notifications</h2><button class="primary" onclick="openNotificationSettings()">Manage</button></div><div class="card" id="notificationsCard"></div><div class="section-title"><h2>Smart insights</h2><span class="chip green">Based on your data</span></div>
+<div class="card" id="smartInsights"></div>
+<div class="section-title"><h2>Cash flow</h2><span class="chip green">This month</span></div>
+<div class="card" id="cashFlowCard"></div>
+<div class="section-title"><h2>Savings goals</h2><button class="primary" onclick="openGoalManager()">Add goal</button></div>
+<div class="card" id="goalsCard"></div>
+</section>
+
+<section class="page" id="profile">
+<div class="section-title" style="margin-top:4px"><h2>Profile & accounts</h2><span class="chip green">Secure</span></div>
+<div class="card" style="background:#101827;color:#fff;border-color:#101827">
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="avatar" style="width:48px!important;height:48px!important;background:#22C55E" id="profileAvatar">•</div>
+    <div><b style="font-size:16px" id="profileName">—</b><div style="color:#CBD5E1;font-size:10px;margin-top:2px" id="profileEmail">—</div></div>
+  </div>
+  <div style="display:flex;gap:7px;margin-top:12px;flex-wrap:wrap">
+    <span class="chip" style="background:rgba(255,255,255,.1);color:#D9FBE8">India · INR</span>
+  </div>
+</div>
+
+<div class="section-title"><h2>Connected accounts</h2></div>
+<div class="grid g3" id="accounts"></div>
+
+<div class="section-title"><h2>Connections</h2></div>
+<div class="card">
+  <div class="account">
+    <div class="bankicon">G</div>
+    <div class="grow"><b>Gmail transaction capture</b><div class="muted">Capture eligible transactions from email receipts</div></div>
+    <span class="chip" id="gmailChip">Loading…</span>
+  </div>
+  <div style="height:1px;background:#F1F5F9;margin:12px 0"></div>
+  <div id="gmailActionRow" style="display:flex;gap:8px"></div>
+  <div style="height:1px;background:#F1F5F9;margin:12px 0"></div>
+  <div class="account">
+    <div class="bankicon">AA</div>
+    <div class="grow"><b>Bank Account Aggregator</b><div class="muted">Secure bank connection for automatic transaction capture</div></div>
+    <span class="chip" id="aaChip">Loading…</span>
+  </div>
+  <div style="height:1px;background:#F1F5F9;margin:12px 0"></div>
+  <div id="aaActionRow" style="display:flex;gap:8px"></div>
+</div>
+
+<div class="section-title"><h2>Preferences</h2></div>
+<div class="card">
+  <div class="account"><div class="grow"><b>Notifications</b><div class="muted">Manage proactive money alerts</div></div><button class="secondary" onclick="go('insights')">Manage</button></div>
+  <div style="height:1px;background:#F1F5F9;margin:12px 0"></div>
+  <div class="account"><div class="grow"><b>Currency</b><div class="muted">Indian Rupee (INR)</div></div><span class="chip">₹</span></div>
+  <div style="height:1px;background:#F1F5F9;margin:12px 0"></div>
+  <div class="account"><div class="grow"><b>Session</b><div class="muted">Sign out of Minto on this device</div></div><button class="secondary" onclick="logout()">Log out</button></div>
+</div>
+
+<div class="section-title"><h2>About Minto</h2></div>
+<div class="card"><b>Minto</b><div class="muted" style="margin-top:4px">Your personal money companion.</div><div class="muted" style="margin-top:10px">v1.0 · Real backend + bank &amp; Gmail integrations</div></div>
+</section>
+
+</div>
+<nav class="phone-nav" aria-label="Primary navigation">
+  <button data-page="home" class="active">
+    <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3.5 10.5 12 3.5l8.5 7v9a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z"/></svg></span>
+    <span>Home</span>
+  </button>
+  <button data-page="transactions">
+    <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M7 4v16M7 4l-3 3M7 4l3 3M17 20V4m0 16 3-3m-3 3-3-3"/></svg></span>
+    <span>Transactions</span>
+  </button>
+  <button data-page="add" class="nav-add" aria-label="Add">＋</button>
+  <button data-page="insights">
+    <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 3l1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7zM19 16l.6 1.9L21.5 18l-1.9.6L19 20.5l-.6-1.9-1.9-.6 1.9-.6z"/></svg></span>
+    <span>Insights</span>
+  </button>
+  <button data-page="profile">
+    <span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 21c.6-4 3-6 7-6s6.4 2 7 6"/></svg></span>
+    <span>Profile</span>
+  </button>
+</nav>
+</main>
+</div>
+
+<div class="modal-wrap" id="modal"><div class="modal"><div class="modal-head"><h2 id="modalTitle">Minto</h2><button class="close" onclick="closeModal()">×</button></div><div id="modalBody"></div></div></div>
+
+<script src="/api.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>
