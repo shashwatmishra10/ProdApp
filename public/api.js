@@ -21,6 +21,7 @@ const Api = {
 
   createTransaction: (payload) => api("/transactions", { method: "POST", body: JSON.stringify(payload) }),
   deleteTransaction: (id) => api(`/transactions/${id}`, { method: "DELETE" }),
+  emailExport: (email, csv) => api("/transactions/email-export", { method: "POST", body: JSON.stringify({ email, csv }) }),
 
   saveBudget: (payload) => api("/budget", { method: "PUT", body: JSON.stringify(payload) }),
 

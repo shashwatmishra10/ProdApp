@@ -10,7 +10,7 @@ const icons = { Food: "🍔", Travel: "🚕", Shopping: "🛍️", Subscriptions
 // ---------------------------------------------------------------------------
 // Icons (same visual set as the original prototype)
 // ---------------------------------------------------------------------------
-function svgWrap(body) { return `<span class="merchant-logo">${body}</span>`; }
+function svgWrap(body, bg) { return `<span class="merchant-logo" style="background:${bg || "transparent"}">${body}</span>`; }
 const BRAND_MARKS = { netflix: "<svg viewBox=\"0 0 32 32\"><rect width=\"32\" height=\"32\" rx=\"8\" fill=\"#111\"/><path d=\"M8 5h4l8 16V5h4v22h-4l-8-16v16H8z\" fill=\"#E50914\"/></svg>", spotify: "<svg viewBox=\"0 0 496 512\"><path fill=\"#1DB954\" d=\"M248 8C111.1 8 0 119.1 0 256s111.1 248 248 248 248-111.1 248-248S384.9 8 248 8zm100.7 364.9c-4.2 0-6.8-1.3-10.7-3.6-62.4-37.6-135-39.2-206.7-24.5-3.9 1-9 2.6-11.9 2.6-9.7 0-15.8-7.7-15.8-15.8 0-10.3 6.1-15.2 13.6-16.8 81.9-18.1 165.6-16.5 237 26.2 6.1 3.9 9.7 7.4 9.7 16.5s-7.1 15.4-15.2 15.4zm26.9-65.6c-5.2 0-8.7-2.3-12.3-4.2-62.5-37-155.7-51.9-238.6-29.4-4.8 1.3-7.4 2.6-11.9 2.6-10.7 0-19.4-8.7-19.4-19.4s5.2-17.8 15.5-20.7c27.8-7.8 56.2-13.6 97.8-13.6 64.9 0 127.6 16.1 177 45.5 8.1 4.8 11.3 11 11.3 19.7-.1 10.8-8.5 19.5-19.4 19.5zm31-76.2c-5.2 0-8.4-1.3-12.9-3.9-71.2-42.5-198.5-52.7-280.9-29.7-3.6 1-8.1 2.6-12.9 2.6-13.2 0-23.3-10.3-23.3-23.6 0-13.6 8.4-21.3 17.4-23.9 35.2-10.3 74.6-15.2 117.5-15.2 73 0 149.5 15.2 205.4 47.8 7.8 4.5 12.9 10.7 12.9 22.6 0 13.6-11 23.3-23.2 23.3z\"/></svg>", amazon: "<svg viewBox=\"0 0 448 512\"><path fill=\"#111\" d=\"M257.2 162.7c-48.7 1.8-169.5 15.5-169.5 117.5 0 109.5 138.3 114 183.5 43.2 6.5 10.2 35.4 37.5 45.3 46.8l56.8-56S341 288.9 341 261.4V114.3C341 89 316.5 32 228.7 32 140.7 32 94 87 94 136.3l73.5 6.8c16.3-49.5 54.2-49.5 54.2-49.5 40.7-.1 35.5 29.8 35.5 69.1zm0 86.8c0 80-84.2 68-84.2 17.2 0-47.2 50.5-56.7 84.2-57.8v40.6zm136 163.5c-7.7 10-70 67-174.5 67S34.2 408.5 9.7 379c-6.8-7.7 1-11.3 5.5-8.3C88.5 415.2 203 488.5 387.7 401c7.5-3.7 13.3 2 5.5 12zm39.8 2.2c-6.5 15.8-16 26.8-21.2 31-5.5 4.5-9.5 2.7-6.5-3.8s19.3-46.5 12.7-55c-6.5-8.3-37-4.3-48-3.2-10.8 1-13 2-14-.3-2.3-5.7 21.7-15.5 37.5-17.5 15.7-1.8 41-.8 46 5.7 3.7 5.1 0 27.1-6.5 43.1z\"/><path fill=\"none\" stroke=\"#FF9900\" stroke-width=\"14\" stroke-linecap=\"round\" d=\"M45 401c100 74 232 69 345 8\"/></svg>", uber: "<svg viewBox=\"0 0 448 512\"><path fill=\"#111\" d=\"M414.1 32H33.9C15.2 32 0 47.2 0 65.9V446c0 18.8 15.2 34 33.9 34H414c18.7 0 33.9-15.2 33.9-33.9V65.9C448 47.2 432.8 32 414.1 32zM237.6 391.1C163 398.6 96.4 344.2 88.9 269.6h94.4V290c0 3.7 3 6.8 6.8 6.8H258c3.7 0 6.8-3 6.8-6.8v-67.9c0-3.7-3-6.8-6.8-6.8h-67.9c-3.7 0-6.8 3-6.8 6.8v20.4H88.9c7-69.4 65.4-122.2 135.1-122.2 69.7 0 128.1 52.8 135.1 122.2 7.5 74.5-46.9 141.1-121.5 148.6z\"/></svg>", swiggy: "<svg viewBox=\"0 0 32 32\"><rect width=\"32\" height=\"32\" rx=\"9\" fill=\"#FF6B00\"/><path d=\"M10 22c5.7-1.5 9.1-4.1 9.1-7.2 0-2.2-1.8-3.7-4.4-3.7-1.8 0-3.6.7-4.8 1.8\" fill=\"none\" stroke=\"#fff\" stroke-width=\"2.5\" stroke-linecap=\"round\"/><path d=\"M10 22c3.7 1.4 8.4.8 11.2-2.1\" fill=\"none\" stroke=\"#fff\" stroke-width=\"2.5\" stroke-linecap=\"round\"/></svg>", zomato: "<svg viewBox=\"0 0 32 32\"><rect width=\"32\" height=\"32\" rx=\"8\" fill=\"#E23744\"/><text x=\"16\" y=\"21\" text-anchor=\"middle\" font-size=\"17\" font-weight=\"900\" font-family=\"Arial\" fill=\"#fff\">z</text></svg>", blinkit: "<svg viewBox=\"0 0 32 32\"><circle cx=\"16\" cy=\"16\" r=\"15\" fill=\"#F7D83E\"/><path d=\"M9 11h10l-7 5h10l-8 6\" fill=\"none\" stroke=\"#111\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>", flipkart: "<svg viewBox=\"0 0 32 32\"><rect width=\"32\" height=\"32\" rx=\"8\" fill=\"#2874F0\"/><path d=\"M9 11h14l-1.5 13h-11zM12 11a4 4 0 0 1 8 0\" fill=\"none\" stroke=\"#FFD500\" stroke-width=\"2\"/></svg>", makemytrip: "<svg viewBox=\"0 0 32 32\"><rect width=\"32\" height=\"32\" rx=\"8\" fill=\"#E43D30\"/><path d=\"M8 22V10l8 7 8-7v12\" fill=\"none\" stroke=\"#fff\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/></svg>", starbucks: "<svg viewBox=\"0 0 32 32\"><circle cx=\"16\" cy=\"16\" r=\"14\" fill=\"#00704A\"/><circle cx=\"16\" cy=\"16\" r=\"7\" fill=\"#fff\"/><path d=\"M12 15c2-3 6-3 8 0M13 20c2 1 4 1 6 0\" fill=\"none\" stroke=\"#00704A\" stroke-width=\"1.5\" stroke-linecap=\"round\"/></svg>", bookmyshow: "<svg viewBox=\"0 0 32 32\"><rect width=\"32\" height=\"32\" rx=\"8\" fill=\"#F84464\"/><path d=\"M9 10h14v12H9zM12 10v12M20 10v12\" fill=\"none\" stroke=\"#fff\" stroke-width=\"2\"/><path d=\"M14 14l5 2-5 2z\" fill=\"#fff\"/></svg>" };
 function brandIcon(name) {
   const n = String(name || "").toLowerCase().trim();
@@ -27,16 +27,17 @@ function bankIcon(name) {
 }
 function categoryIcon(category) {
   const c = String(category || "").toLowerCase();
-  if (c.includes("food")) return svgWrap(`<svg viewBox="0 0 32 32"><path d="M10 7v8M13 7v8M16 7v8M13 15v10M22 7v18M22 7c4 3 4 8 0 10" fill="none" stroke="#0F766E" stroke-width="2" stroke-linecap="round"/></svg>`);
-  if (c.includes("travel")) return svgWrap(`<svg viewBox="0 0 32 32"><path d="M6 18l20-7c2-.7 3 1.5 1.1 2.5L17 19l-2 7-2-1 0-5-6 1z" fill="none" stroke="#0F766E" stroke-width="2" stroke-linejoin="round"/></svg>`);
-  if (c.includes("shopping")) return svgWrap(`<svg viewBox="0 0 32 32"><path d="M9 11h14l-1 15H10zM12 11a4 4 0 0 1 8 0" fill="none" stroke="#0F766E" stroke-width="2" stroke-linejoin="round"/></svg>`);
-  if (c.includes("subscription")) return svgWrap(`<svg viewBox="0 0 32 32"><rect x="8" y="6" width="16" height="20" rx="3" fill="none" stroke="#7C3AED" stroke-width="2"/><path d="M12 11h8M12 16h8M12 21h5" stroke="#7C3AED" stroke-width="2" stroke-linecap="round"/></svg>`);
-  if (c.includes("grocery")) return svgWrap(`<svg viewBox="0 0 32 32"><path d="M8 10h16l-2 15H10zM12 10a4 4 0 0 1 8 0" fill="none" stroke="#15803D" stroke-width="2"/></svg>`);
-  if (c.includes("rent")) return svgWrap(`<svg viewBox="0 0 32 32"><path d="M6 15l10-8 10 8v11H6zM12 26v-7h8v7" fill="none" stroke="#0F766E" stroke-width="2" stroke-linejoin="round"/></svg>`);
-  if (c.includes("bill")) return svgWrap(`<svg viewBox="0 0 32 32"><path d="M10 5h12v22l-3-2-3 2-3-2-3 2z" fill="none" stroke="#B7791F" stroke-width="2"/><path d="M13 11h6M13 16h6" stroke="#B7791F" stroke-width="2" stroke-linecap="round"/></svg>`);
-  if (c.includes("health")) return svgWrap(`<svg viewBox="0 0 32 32"><path d="M16 26S6 20 6 12a5 5 0 0 1 10-2 5 5 0 0 1 10 2c0 8-10 14-10 14z" fill="none" stroke="#E11D48" stroke-width="2"/></svg>`);
-  if (c.includes("entertainment")) return svgWrap(`<svg viewBox="0 0 32 32"><path d="M7 11h18v14H7zM12 11l2-4M20 11l-2-4" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round"/><path d="M14 15l6 3-6 3z" fill="#7C3AED"/></svg>`);
-  return svgWrap(`<svg viewBox="0 0 32 32"><rect x="6" y="9" width="20" height="14" rx="3" fill="none" stroke="#0F766E" stroke-width="2"/><path d="M6 14h20" stroke="#0F766E" stroke-width="2"/></svg>`);
+  if (c.includes("food")) return svgWrap(`<svg viewBox="0 0 32 32"><path d="M10 7v8M13 7v8M16 7v8M13 15v10M22 7v18M22 7c4 3 4 8 0 10" fill="none" stroke="#EA580C" stroke-width="2" stroke-linecap="round"/></svg>`, "#FFF3EA");
+  if (c.includes("travel")) return svgWrap(`<svg viewBox="0 0 32 32"><path d="M6 18l20-7c2-.7 3 1.5 1.1 2.5L17 19l-2 7-2-1 0-5-6 1z" fill="none" stroke="#2563EB" stroke-width="2" stroke-linejoin="round"/></svg>`, "#EFF6FF");
+  if (c.includes("shopping")) return svgWrap(`<svg viewBox="0 0 32 32"><path d="M9 11h14l-1 15H10zM12 11a4 4 0 0 1 8 0" fill="none" stroke="#DB2777" stroke-width="2" stroke-linejoin="round"/></svg>`, "#FDF2F8");
+  if (c.includes("subscription")) return svgWrap(`<svg viewBox="0 0 32 32"><rect x="8" y="6" width="16" height="20" rx="3" fill="none" stroke="#7C3AED" stroke-width="2"/><path d="M12 11h8M12 16h8M12 21h5" stroke="#7C3AED" stroke-width="2" stroke-linecap="round"/></svg>`, "#F5F3FF");
+  if (c.includes("grocery")) return svgWrap(`<svg viewBox="0 0 32 32"><path d="M8 10h16l-2 15H10zM12 10a4 4 0 0 1 8 0" fill="none" stroke="#15803D" stroke-width="2"/></svg>`, "#F0FDF4");
+  if (c.includes("rent")) return svgWrap(`<svg viewBox="0 0 32 32"><path d="M6 15l10-8 10 8v11H6zM12 26v-7h8v7" fill="none" stroke="#0F766E" stroke-width="2" stroke-linejoin="round"/></svg>`, "#F0FDFA");
+  if (c.includes("bill")) return svgWrap(`<svg viewBox="0 0 32 32"><path d="M10 5h12v22l-3-2-3 2-3-2-3 2z" fill="none" stroke="#B7791F" stroke-width="2"/><path d="M13 11h6M13 16h6" stroke="#B7791F" stroke-width="2" stroke-linecap="round"/></svg>`, "#FFFBEB");
+  if (c.includes("health")) return svgWrap(`<svg viewBox="0 0 32 32"><path d="M16 26S6 20 6 12a5 5 0 0 1 10-2 5 5 0 0 1 10 2c0 8-10 14-10 14z" fill="none" stroke="#E11D48" stroke-width="2"/></svg>`, "#FFF1F2");
+  if (c.includes("entertainment")) return svgWrap(`<svg viewBox="0 0 32 32"><path d="M7 11h18v14H7zM12 11l2-4M20 11l-2-4" fill="none" stroke="#4F46E5" stroke-width="2" stroke-linecap="round"/><path d="M14 15l6 3-6 3z" fill="#4F46E5"/></svg>`, "#EEF2FF");
+  if (c.includes("education")) return svgWrap(`<svg viewBox="0 0 32 32"><path d="M4 12l12-5 12 5-12 5z" fill="none" stroke="#0891B2" stroke-width="2" stroke-linejoin="round"/><path d="M9 15v6c0 1.5 3 3 7 3s7-1.5 7-3v-6" fill="none" stroke="#0891B2" stroke-width="2"/></svg>`, "#ECFEFF");
+  return svgWrap(`<svg viewBox="0 0 32 32"><rect x="6" y="9" width="20" height="14" rx="3" fill="none" stroke="#475569" stroke-width="2"/><path d="M6 14h20" stroke="#475569" stroke-width="2"/></svg>`, "#F1F5F9");
 }
 
 // ---------------------------------------------------------------------------
@@ -177,12 +178,16 @@ function go(page) {
 }
 document.querySelectorAll(".phone-nav button[data-page]").forEach((b) => b.addEventListener("click", () => go(b.dataset.page)));
 
+function userInitial() {
+  return (state.user?.name || "?").trim()[0]?.toUpperCase() || "?";
+}
 function setGreeting() {
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
   const first = (state.user?.name || "there").split(" ")[0];
   document.getElementById("pageTitle").textContent = `${greeting}, ${first} 👋`;
-  document.getElementById("eyebrow").innerHTML = `${new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" })} · <span style="color:#07895f;font-weight:800">● Synced</span>`;
+  document.getElementById("eyebrow").innerHTML = `<span style="color:#07895f;font-weight:800">● All synced</span>`;
+  document.getElementById("avatar").textContent = userInitial();
 }
 function tickClock() {
   document.getElementById("clock").textContent = new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: false });
@@ -222,6 +227,7 @@ function renderHome() {
   catsEl.innerHTML = catEntries.length ? catEntries.map(([c, v]) =>
     `<div class="cat"><div class="ico">${categoryIcon(c)}</div><div class="cat-name">${escapeHtml(c)}<div class="muted">${money(v)}</div></div><div class="bar"><span style="width:${Math.round((v / max) * 100)}%"></span></div><div class="cat-val">${t.spending ? Math.round((v / t.spending) * 100) : 0}%</div></div>`
   ).join("") : '<div class="muted">No spending recorded this month yet.</div>';
+  document.getElementById("viewAllBtn").disabled = catEntries.length === 0;
 
   const insights = smartInsights();
   if (insights.length) {
@@ -239,10 +245,9 @@ function renderHome() {
 // Transactions
 // ---------------------------------------------------------------------------
 let txnFilters = { query: "", category: "ALL", account: "ALL", type: "ALL", date: "ALL" };
-function renderTransactions() {
-  const el = document.getElementById("transactionList"); if (!el) return;
+function filteredTransactions() {
   const q = (txnFilters.query || "").toLowerCase();
-  let list = state.transactions.filter((t) => {
+  return state.transactions.filter((t) => {
     const text = `${t.merchant} ${t.category} ${t.account} ${t.payment} ${t.notes || ""}`.toLowerCase();
     if (q && !text.includes(q)) return false;
     if (txnFilters.category !== "ALL" && t.category !== txnFilters.category) return false;
@@ -250,7 +255,11 @@ function renderTransactions() {
     if (txnFilters.type !== "ALL" && t.type !== txnFilters.type) return false;
     if (txnFilters.date === "MONTH" && monthKey(t.date) !== currentMonthKey()) return false;
     return true;
-  }).sort((a, b) => toDate(b.date) - toDate(a.date));
+  });
+}
+function renderTransactions() {
+  const el = document.getElementById("transactionList"); if (!el) return;
+  let list = filteredTransactions().sort((a, b) => toDate(b.date) - toDate(a.date));
 
   const categories = [...new Set(state.transactions.map((t) => t.category))].sort();
   const accounts = [...new Set(state.transactions.map((t) => t.account))].sort();
@@ -261,7 +270,7 @@ function renderTransactions() {
     <div class="filter-row" style="margin-top:7px">${["ALL", ...categories].map((x) => `<button class="filter-pill ${txnFilters.category === x ? "active" : ""}" onclick="setTxnFilter('category',${JSON.stringify(x)})">${escapeHtml(x === "ALL" ? "All categories" : x)}</button>`).join("")}</div>
     <div class="filter-row" style="margin-top:7px"><button class="filter-pill ${txnFilters.date === "ALL" ? "active" : ""}" onclick="setTxnFilter('date','ALL')">All time</button><button class="filter-pill ${txnFilters.date === "MONTH" ? "active" : ""}" onclick="setTxnFilter('date','MONTH')">This month</button>${accounts.map((x) => `<button class="filter-pill ${txnFilters.account === x ? "active" : ""}" onclick="setTxnFilter('account',${JSON.stringify(x)})">${escapeHtml(x)}</button>`).join("")}</div>
     <div class="export-row">
-      <button class="btn secondary" onclick="exportCSV()"><svg viewBox="0 0 24 24"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 17v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2"/></svg>Export CSV</button>
+      <button class="btn secondary" onclick="openEmailExport()"><svg viewBox="0 0 24 24"><path d="M4 6h16v12H4zM4 6l8 7 8-7"/></svg>Email me a copy</button>
       <button class="btn secondary" onclick="clearTxnFilters()"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5"/></svg>Clear filters</button>
     </div>`;
 
@@ -281,11 +290,32 @@ function renderTransactions() {
 }
 function setTxnFilter(key, value) { txnFilters[key] = value; renderTransactions(); }
 function clearTxnFilters() { txnFilters = { query: "", category: "ALL", account: "ALL", type: "ALL", date: "ALL" }; renderTransactions(); }
-function exportCSV() {
-  const rows = [["Date", "Merchant", "Type", "Category", "Amount", "Account", "Payment", "Source", "Recurring", "Notes"], ...state.transactions.map((t) => [t.date, t.merchant, t.type, t.category, t.amount, t.account, t.payment, t.source, t.recurring ? "Yes" : "No", t.notes || ""])];
-  const csv = rows.map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" }), url = URL.createObjectURL(blob), a = document.createElement("a");
-  a.href = url; a.download = "minto-transactions.csv"; a.click(); URL.revokeObjectURL(url); toast("CSV exported");
+function buildTransactionsCsv() {
+  const rows = [["Date", "Merchant", "Type", "Category", "Amount", "Account", "Payment", "Source", "Recurring", "Notes"], ...filteredTransactions().map((t) => [t.date, t.merchant, t.type, t.category, t.amount, t.account, t.payment, t.source, t.recurring ? "Yes" : "No", t.notes || ""])];
+  return rows.map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
+}
+function downloadCsv() {
+  const blob = new Blob([buildTransactionsCsv()], { type: "text/csv;charset=utf-8" }), url = URL.createObjectURL(blob), a = document.createElement("a");
+  a.href = url; a.download = "minto-transactions.csv"; a.click(); URL.revokeObjectURL(url);
+}
+function openEmailExport() {
+  openModal("Email me a copy", `
+  <div class="muted" style="margin-bottom:10px">We'll send a CSV of your current transaction list (with any filters you've applied) to this address.</div>
+  <div class="field full"><label>Email address</label><input id="exportEmail" type="email" value="${escapeHtml(state.user?.email || "")}"></div>
+  <div class="action-row"><button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="sendEmailExport()">Send</button></div>`);
+}
+async function sendEmailExport() {
+  const email = document.getElementById("exportEmail").value.trim();
+  if (!email) { toast("Enter an email address"); return; }
+  try {
+    await Api.emailExport(email, buildTransactionsCsv());
+    closeModal();
+    successToast(`✓ Sent to ${email}`);
+  } catch (err) {
+    closeModal();
+    downloadCsv();
+    toast(err.message.includes("not configured") ? "Email isn't set up yet — downloaded the CSV instead" : err.message);
+  }
 }
 function openTransactionDetail(id) {
   const t = state.transactions.find((x) => x.id === id); if (!t) return;
@@ -300,7 +330,7 @@ function openTransactionDetail(id) {
       <div class="detail-item"><span>RECURRING</span>${t.recurring ? "Yes" : "No"}</div>
     </div>
     ${t.notes ? `<div class="muted"><b style="color:#0F172A">Notes:</b> ${escapeHtml(t.notes)}</div>` : ""}
-    <div class="action-row"><button class="secondary" onclick="closeModal()">Close</button><button class="secondary danger" onclick="deleteTransaction('${t.id}')">Delete</button></div>`);
+    <div class="action-row"><button class="btn secondary" onclick="closeModal()">Close</button><button class="btn secondary danger" onclick="deleteTransaction('${t.id}')">Delete</button></div>`);
 }
 async function deleteTransaction(id) {
   if (!confirm("Delete this transaction?")) return;
@@ -317,6 +347,21 @@ function setType(btn, newType) {
   btn.parentElement.querySelectorAll("button").forEach((b) => b.classList.toggle("active", b === btn));
   document.getElementById("toAccountWrap").style.display = newType === "TRANSFER" ? "block" : "none";
 }
+function merchantCategoryMap() {
+  const map = {};
+  [...state.transactions].sort((a, b) => toDate(a.date) - toDate(b.date)).forEach((t) => { map[t.merchant.toLowerCase()] = t.category; });
+  return map;
+}
+function populateMerchantList() {
+  const list = document.getElementById("merchantList");
+  const names = [...new Set(state.transactions.map((t) => t.merchant))].sort();
+  list.innerHTML = names.map((n) => `<option value="${escapeHtml(n)}">`).join("");
+}
+function onMerchantInput() {
+  const merchant = document.getElementById("merchant").value.trim().toLowerCase();
+  const category = merchantCategoryMap()[merchant];
+  if (category) document.getElementById("category").value = category;
+}
 function resetForm() {
   const form = document.getElementById("expenseForm");
   if (form) form.reset();
@@ -325,6 +370,7 @@ function resetForm() {
   const tabs = document.querySelector("#add .tabs");
   if (tabs) { tabs.querySelectorAll("button").forEach((b, i) => b.classList.toggle("active", i === 0)); }
   type = "EXPENSE";
+  populateMerchantList();
 }
 document.getElementById("expenseForm").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -359,17 +405,26 @@ function renderSmartInsights() {
   const list = smartInsights();
   el.innerHTML = list.length ? list.map((x) => `<div class="insight"><div class="insight-icon">${x.icon}</div><div class="grow"><b>${escapeHtml(x.title)}</b><p>${escapeHtml(x.text)}</p><button class="insight-action">${escapeHtml(x.action)} →</button></div></div>`).join("") : '<div class="muted">Keep using Minto and smart insights will appear as patterns emerge.</div>';
 }
+function alertListHtml(list) {
+  return list.length
+    ? `<div class="alert-list">${list.map((x) => `<div class="alert-item"><div class="alert-icon ${x.type}">${x.icon}</div><div class="grow"><b>${escapeHtml(x.title)}</b><p>${escapeHtml(x.text)}</p></div></div>`).join("")}</div>`
+    : '<div class="empty-state"><div class="big">✓</div><b>All clear</b><div style="margin-top:4px">No active alerts right now.</div></div>';
+}
 function renderNotifications() {
   const el = document.getElementById("notificationsCard"); if (!el) return;
-  const list = notificationData();
-  el.innerHTML = list.length ? `<div class="alert-list">${list.map((x) => `<div class="alert-item"><div class="alert-icon ${x.type}">${x.icon}</div><div class="grow"><b>${escapeHtml(x.title)}</b><p>${escapeHtml(x.text)}</p></div></div>`).join("")}</div>` : '<div class="empty-state"><div class="big">✓</div><b>All clear</b><div style="margin-top:4px">No active alerts right now.</div></div>';
+  el.innerHTML = alertListHtml(notificationData());
+}
+function openNotificationsPopup() {
+  openModal("Notifications", `
+  ${alertListHtml(notificationData())}
+  <div class="action-row"><button class="btn secondary" onclick="closeModal();openNotificationSettings()">Manage alerts</button><button class="btn primary" onclick="closeModal()">Done</button></div>`);
 }
 function openNotificationSettings() {
   const ns = state.notificationSettings;
   openModal("Notification settings", `
   <div class="muted" style="margin-bottom:10px">Choose which alerts Minto should surface.</div>
   ${[["lowBalance", "Low balance alerts", "Warn when an account falls below ₹500."], ["budgetAlert", "Budget alerts", "Warn when monthly spending reaches 80% of budget."], ["recurring", "Upcoming recurring payments", "Surface upcoming subscriptions and commitments."], ["unusual", "Unusual transactions", "Flag unusually large transactions."], ["settlement", "Settlement reminders", "Remind you about money owed to you."], ["sync", "Account sync status", "Show connection and sync status."]].map((x) => `<div class="alert-item"><div class="grow"><b>${x[1]}</b><p>${x[2]}</p></div><button class="alert-toggle ${ns[x[0]] ? "on" : ""}" onclick="toggleNotificationSetting('${x[0]}',this)"></button></div>`).join("")}
-  <div class="action-row"><button class="primary" onclick="closeModal();renderNotifications();toast('Preferences saved')">Done</button></div>`);
+  <div class="action-row"><button class="btn primary" onclick="closeModal();renderNotifications();toast('Preferences saved')">Done</button></div>`);
 }
 async function toggleNotificationSetting(key, button) {
   state.notificationSettings[key] = !state.notificationSettings[key];
@@ -385,7 +440,7 @@ function renderGoals() {
     return `<div class="goal">
       <div class="goal-head"><div class="goal-icon">${escapeHtml(g.icon || "🎯")}</div><div class="grow"><b>${escapeHtml(g.name)}</b><div class="muted">${money(g.saved)} of ${money(g.target)} · ${pct}%</div></div><b>${money(left)}</b></div>
       <div class="goal-progress"><span style="width:${pct}%"></span></div>
-      <div class="goal-actions"><button class="secondary" onclick="addToGoal('${g.id}')">Add money</button><button class="secondary" onclick="editGoal('${g.id}')">Edit</button><button class="secondary danger" onclick="deleteGoal('${g.id}')">Delete</button></div>
+      <div class="goal-actions"><button class="btn secondary" onclick="addToGoal('${g.id}')">Add money</button><button class="btn secondary" onclick="editGoal('${g.id}')">Edit</button><button class="btn secondary danger" onclick="deleteGoal('${g.id}')">Delete</button></div>
     </div>`;
   }).join("") : '<div class="muted">No savings goals yet. Add your first goal.</div>';
 
@@ -402,7 +457,7 @@ function openGoalManager(id) {
    <div class="field"><label>Already saved</label><input id="goalSaved" type="number" min="0" value="${g?.saved || 0}"></div>
    <div class="field"><label>Target date</label><input id="goalDate" type="date" value="${g?.deadline || ""}"></div>
    <div class="field"><label>Icon</label><select id="goalIcon"><option${g?.icon === "🛟" ? " selected" : ""}>🛟</option><option${g?.icon === "✈️" ? " selected" : ""}>✈️</option><option${g?.icon === "🚗" ? " selected" : ""}>🚗</option><option${g?.icon === "🏠" ? " selected" : ""}>🏠</option><option${g?.icon === "🎓" ? " selected" : ""}>🎓</option><option${g?.icon === "💻" ? " selected" : ""}>💻</option><option${!g || g?.icon === "🎯" ? " selected" : ""}>🎯</option></select></div>
-   <div class="full action-row"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveGoal('${id || ""}')">Save goal</button></div>
+   <div class="full action-row"><button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveGoal('${id || ""}')">Save goal</button></div>
   </div>`);
 }
 async function saveGoal(id) {
@@ -418,7 +473,7 @@ async function saveGoal(id) {
   closeModal(); renderGoals(); renderHome(); toast("Savings goal saved");
 }
 function addToGoal(id) {
-  openModal("Add to savings goal", `<div class="field"><label>Amount</label><input id="goalContribution" type="number" min="1" value="1000"></div><div class="muted" style="margin-top:8px">This updates the goal balance. It does not create a bank transaction.</div><div class="action-row"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="contributeGoal('${id}')">Add</button></div>`);
+  openModal("Add to savings goal", `<div class="field"><label>Amount</label><input id="goalContribution" type="number" min="1" value="1000"></div><div class="muted" style="margin-top:8px">This updates the goal balance. It does not create a bank transaction.</div><div class="action-row"><button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="contributeGoal('${id}')">Add</button></div>`);
 }
 async function contributeGoal(id) {
   const amount = Number(document.getElementById("goalContribution").value) || 0;
@@ -435,10 +490,55 @@ async function deleteGoal(id) {
   renderGoals(); toast("Goal deleted");
 }
 
+// Fixed-order categorical palette (validated for CVD-safe adjacency at
+// dataviz-skill/references/palette.md); "Other" uses a neutral gray, not a
+// 6th competing hue, per the anti-cycling rule.
+const CATEGORY_CHART_COLORS = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4"];
+const CATEGORY_CHART_OTHER_COLOR = "#94A3B8";
+
+function renderCategoryChart() {
+  const el = document.getElementById("categoryChart");
+  if (!el) return;
+  const actuals = budgetActuals();
+  const entries = Object.entries(actuals).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
+  const total = entries.reduce((sum, [, v]) => sum + v, 0);
+  if (!total) {
+    el.innerHTML = '<div class="empty-state"><div class="big">◔</div><b>No spending yet</b><div style="margin-top:4px">Add a few transactions to see where your money goes.</div></div>';
+    return;
+  }
+  const top = entries.slice(0, 5);
+  const otherTotal = entries.slice(5).reduce((sum, [, v]) => sum + v, 0);
+  const segments = top.map(([name, value], i) => ({ name, value, color: CATEGORY_CHART_COLORS[i] }));
+  if (otherTotal > 0) segments.push({ name: "Other", value: otherTotal, color: CATEGORY_CHART_OTHER_COLOR });
+
+  const gap = 1.2; // visual gap between segments, in path-length percent
+  let cumulative = 0;
+  const arcs = segments.map((s) => {
+    const pct = (s.value / total) * 100;
+    const dash = Math.max(0, pct - gap);
+    const circle = `<circle cx="21" cy="21" r="15.9155" pathLength="100" fill="none" stroke="${s.color}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${dash} ${100 - dash}" stroke-dashoffset="${-cumulative}"><title>${escapeHtml(s.name)}: ${money(s.value)} (${Math.round(pct)}%)</title></circle>`;
+    cumulative += pct;
+    return circle;
+  }).join("");
+
+  const legend = segments.map((s) => {
+    const pct = Math.round((s.value / total) * 100);
+    return `<div class="chart-legend-row"><span class="chart-dot" style="background:${s.color}"></span><span class="grow">${escapeHtml(s.name)}</span><b>${money(s.value)}</b><span class="muted" style="width:34px;text-align:right">${pct}%</span></div>`;
+  }).join("");
+
+  el.innerHTML = `
+    <div class="donut-wrap">
+      <svg viewBox="0 0 42 42" class="donut-chart">${arcs}</svg>
+      <div class="donut-center"><b>${money(total)}</b><span class="muted">spent</span></div>
+    </div>
+    <div class="chart-legend">${legend}</div>`;
+}
+
 function renderInsights() {
   renderNotifications();
   renderSmartInsights();
   renderGoals();
+  renderCategoryChart();
 
   const shared = sharedSummary();
   const sharedEl = document.getElementById("sharedMoney");
@@ -485,7 +585,6 @@ function renderInsights() {
   const projected = Math.round(bt.spending + dailyRate * (daysInMonth - day) + futureRecurring);
   document.getElementById("forecastAmount").textContent = money(projected);
   document.getElementById("forecastAmount2").textContent = money(projected);
-  document.getElementById("forecastBar").style.width = bt.budget ? Math.min(100, Math.round((projected / bt.budget) * 100)) + "%" : "0%";
   document.getElementById("forecastChip").textContent = bt.budget && projected > bt.budget ? "Above budget" : "Within budget";
 }
 async function settleGroup(id) {
@@ -500,8 +599,7 @@ async function settleGroup(id) {
 function renderProfile() {
   document.getElementById("profileName").textContent = state.user?.name || "—";
   document.getElementById("profileEmail").textContent = state.user?.email || "—";
-  const initial = (state.user?.name || "?").trim()[0]?.toUpperCase() || "?";
-  document.getElementById("profileAvatar").textContent = initial;
+  document.getElementById("profileAvatar").textContent = userInitial();
 
   const balances = accountBalances();
   document.getElementById("accounts").innerHTML = state.accounts.map((a) => {
@@ -537,7 +635,7 @@ function openAccount(name) {
     </div>
     <h3 style="margin:18px 0 7px">Recent activity</h3>
     <div>${tx.slice(0, 7).map((t) => `<div class="txn" style="padding:10px 0"><div class="ico">${brandIcon(t.merchant) || categoryIcon(t.category)}</div><div class="txn-info"><b>${escapeHtml(t.merchant)}</b><small>${formatDate(t.date)} · ${escapeHtml(t.category)}</small></div><div class="txn-amt">${isIncome(t) || isRefund(t) ? "+" : "−"}${money(t.amount)}</div></div>`).join("") || '<div class="muted">No transactions in this account.</div>'}</div>
-    <div class="action-row"><button class="secondary" onclick="closeModal()">Close</button><button class="primary" onclick="closeModal();go('add')">Add transaction</button></div>`);
+    <div class="action-row"><button class="btn secondary" onclick="closeModal()">Close</button><button class="btn primary" onclick="closeModal();go('add')">Add transaction</button></div>`);
 }
 
 async function renderIntegrationStatus() {
@@ -591,35 +689,72 @@ function receiptChosen(input) {
   if (!input.files?.length) return;
   document.getElementById("modalBody").innerHTML = `<div class="card" style="background:#F8FAFC;box-shadow:none"><span class="chip purple">AI EXTRACTED</span><h2 style="margin:9px 0 2px">Starbucks</h2><div class="amount">₹540</div><p class="muted">Food · Today · UPI</p><button class="btn primary" onclick="closeModal();go('add');toast('Fill in and save to add this transaction')">Use these details</button></div>`;
 }
+let splitPeopleList = [];
 function openSplit() {
+  splitPeopleList = ["Rahul", "Priya"];
   openModal("Split expense", `
   <div class="formgrid">
    <div class="field full"><label>Expense</label><input id="splitName" value="Dinner"></div>
    <div class="field"><label>Total amount</label><input id="splitAmt" value="2400" type="number" min="1"></div>
    <div class="field"><label>Your share</label><input id="yourShare" value="800" type="number" min="0"></div>
-   <div class="field full"><label>People (comma separated)</label><input id="splitPeople" value="Rahul, Priya"></div>
+   <div class="field full">
+     <label>People</label>
+     <div style="display:flex;gap:8px">
+       <input id="splitPersonInput" placeholder="Add a person's name" onkeydown="if(event.key==='Enter'){event.preventDefault();addSplitPerson()}">
+       <button type="button" class="btn secondary" onclick="addSplitPerson()">Add</button>
+     </div>
+     <div id="splitPeopleChips" class="split-people-chips"></div>
+   </div>
    <div class="field full"><label>Split method</label><select id="splitMethod"><option value="equal">Equal split</option><option value="custom">Custom</option></select></div>
    <div class="full card" style="background:#F8FAFC;box-shadow:none" id="splitPreview"></div>
-   <div class="full" style="display:flex;justify-content:flex-end;gap:8px"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="createSplit()">Create split</button></div>
+   <div class="full" style="display:flex;justify-content:flex-end;gap:8px"><button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="createSplit()">Create split</button></div>
   </div>`);
+  renderSplitPeopleChips();
   updateSplitPreview();
-  ["splitAmt", "yourShare", "splitPeople", "splitMethod"].forEach((id) => document.getElementById(id).addEventListener("input", updateSplitPreview));
+  ["splitAmt", "yourShare", "splitMethod"].forEach((id) => document.getElementById(id).addEventListener("input", updateSplitPreview));
+}
+function addSplitPerson() {
+  const input = document.getElementById("splitPersonInput");
+  const name = input.value.trim();
+  if (!name) return;
+  if (splitPeopleList.some((p) => p.toLowerCase() === name.toLowerCase())) { toast("Already added"); input.value = ""; return; }
+  splitPeopleList.push(name);
+  input.value = "";
+  input.focus();
+  renderSplitPeopleChips();
+  updateSplitPreview();
+}
+function removeSplitPerson(index) {
+  splitPeopleList.splice(index, 1);
+  renderSplitPeopleChips();
+  updateSplitPreview();
+}
+function renderSplitPeopleChips() {
+  const el = document.getElementById("splitPeopleChips");
+  if (!el) return;
+  el.innerHTML = splitPeopleList.length
+    ? splitPeopleList.map((name, i) => `<span class="split-chip">${escapeHtml(name)}<button type="button" onclick="removeSplitPerson(${i})" aria-label="Remove ${escapeHtml(name)}">×</button></span>`).join("")
+    : '<span class="muted" style="font-size:11px">No one added yet</span>';
 }
 function updateSplitPreview() {
   const total = Number(document.getElementById("splitAmt")?.value) || 0;
-  const people = (document.getElementById("splitPeople")?.value || "").split(",").map((x) => x.trim()).filter(Boolean);
+  const people = splitPeopleList;
   const totalPeople = people.length + 1;
   const equal = totalPeople ? total / totalPeople : 0;
   const your = Number(document.getElementById("yourShare")?.value) || 0;
   const each = (total - your) / Math.max(1, people.length);
   const method = document.getElementById("splitMethod")?.value;
   const vals = method === "equal" ? people.map((p) => ({ name: p, share: Math.round(equal) })) : people.map((p) => ({ name: p, share: Math.round(each) }));
-  document.getElementById("splitPreview").innerHTML = `<b>${money(total)} total</b><div class="muted" style="margin-top:5px">You: ${money(method === "equal" ? equal : your)} · ${vals.map((v) => `${v.name}: ${money(v.share)}`).join(" · ")}</div>`;
+  const previewEl = document.getElementById("splitPreview");
+  if (!previewEl) return;
+  previewEl.innerHTML = people.length
+    ? `<b>${money(total)} total</b><div class="muted" style="margin-top:5px">You: ${money(method === "equal" ? equal : your)} · ${vals.map((v) => `${escapeHtml(v.name)}: ${money(v.share)}`).join(" · ")}</div>`
+    : `<div class="muted">Add at least one person to see the split.</div>`;
 }
 async function createSplit() {
   const total = Number(document.getElementById("splitAmt").value) || 0;
   const name = document.getElementById("splitName").value.trim() || "Shared expense";
-  const people = document.getElementById("splitPeople").value.split(",").map((x) => x.trim()).filter(Boolean);
+  const people = splitPeopleList;
   const method = document.getElementById("splitMethod").value;
   if (total <= 0 || !people.length) { toast("Add a valid amount and at least one person"); return; }
   const your = method === "equal" ? Math.round(total / (people.length + 1)) : Number(document.getElementById("yourShare").value) || 0;
@@ -630,7 +765,9 @@ async function createSplit() {
   people.forEach((person) => { const share = each + (leftover > 0 ? 1 : 0); leftover--; participants.push({ name: person, share, paid: 0, settled: false }); });
   await Api.createSharedGroup({ name, date: todayKey(), participants });
   await refreshState();
-  closeModal(); renderHome(); renderProfile(); toast("Shared expense created");
+  closeModal();
+  renderHome(); renderProfile();
+  successToast("✓ Split created successfully");
 }
 
 // ---------------------------------------------------------------------------
@@ -646,7 +783,7 @@ function openBudgetManager() {
   ${cats.map((c) => `<div class="field" style="margin:8px 0"><label>${escapeHtml(c)}</label><input class="budget-input" data-cat="${escapeHtml(c)}" type="number" min="0" value="${Number(state.budget.categories[c] || 0)}"></div>`).join("")}
   </div>
   <div style="display:flex;align-items:center;gap:8px;margin:12px 0"><input id="budgetRollover" type="checkbox" ${state.budget.rollover ? "checked" : ""} style="width:auto"><label for="budgetRollover" style="font-size:12px;font-weight:700">Carry unused category budget forward</label></div>
-  <div class="action-row"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveBudgetManager()">Save budget</button></div>`);
+  <div class="action-row"><button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveBudgetManager()">Save budget</button></div>`);
 }
 async function saveBudgetManager() {
   const total = Math.max(0, Number(document.getElementById("budgetTotal").value) || 0);
@@ -664,6 +801,7 @@ async function saveBudgetManager() {
 function openModal(title, body) { document.getElementById("modalTitle").textContent = title; document.getElementById("modalBody").innerHTML = body; document.getElementById("modal").classList.add("open"); }
 function closeModal() { document.getElementById("modal").classList.remove("open"); }
 function toast(msg) { const e = document.createElement("div"); e.className = "toast"; e.textContent = msg; document.body.appendChild(e); setTimeout(() => e.remove(), 2200); }
+function successToast(msg) { const e = document.createElement("div"); e.className = "toast toast-success"; e.textContent = msg; document.body.appendChild(e); setTimeout(() => e.remove(), 2000); }
 
 // ---------------------------------------------------------------------------
 // Boot

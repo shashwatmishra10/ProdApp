@@ -14,14 +14,14 @@
 <div class="topbar">
       <div><div class="eyebrow" id="eyebrow"></div><h1 id="pageTitle">Hi 👋</h1></div>
       <div style="display:flex;align-items:center;gap:8px">
-        <button class="header-icon" onclick="go('insights')"><svg viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><i id="notifDot" hidden></i></button>
-        <div class="avatar" id="avatar">•</div>
+        <button class="header-icon" onclick="openNotificationsPopup()" aria-label="Notifications"><svg viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><i id="notifDot" hidden></i></button>
+        <button class="avatar" id="avatar" onclick="go('profile')" aria-label="Profile" style="border:0;padding:0;font:inherit;cursor:pointer">•</button>
       </div>
     </div>
 
 <section class="page active" id="home">
   <div class="grid g4">
-    <div class="card balance"><div class="muted">Available balance</div><div class="amount" id="balance">₹0</div><div class="muted" style="margin-top:5px">Across your connected accounts</div></div>
+    <div class="card balance"><div class="muted" style="display:flex;align-items:center;gap:5px">Available balance<span title="The total across your Cash, bank and card accounts, based on the transactions you've recorded in Minto." style="cursor:help;opacity:.8">ⓘ</span></div><div class="amount" id="balance">₹0</div><div class="muted" style="margin-top:5px">Across your connected accounts</div></div>
     <div class="card"><div class="muted">Spent this month</div><div class="stat" id="monthSpend">₹0</div><div class="muted" id="monthComparison" style="font-size:11px;margin-top:6px"></div></div>
     <div class="card"><div class="muted">Monthly budget</div><div class="stat" id="budgetPct">0%</div><div class="muted"><span id="budgetSpent">₹0</span> of <span id="budgetTotalLabel">₹0</span></div></div>
     <div class="card"><div class="muted">Owed to you</div><div class="stat positive" id="owed">₹0</div><div class="muted">from shared expenses</div></div>
@@ -34,7 +34,7 @@
     <div class="muted" id="budgetRemaining"></div>
   </div>
 
-  <div class="section-title"><h2>Spending snapshot</h2><button class="link" onclick="go('transactions')">View all</button></div>
+  <div class="section-title"><h2>Spending snapshot</h2><button class="link" id="viewAllBtn" onclick="go('transactions')">View all</button></div>
   <div class="grid g2">
     <div class="card categories" id="categories"></div>
     <div class="card insight"><div class="tag">✦ MINTO NOTICED</div><h3 id="insightHeadline">Keep tracking to unlock insights.</h3><p id="insightBody">Add a few transactions and Minto will start noticing patterns in your spending.</p><button class="btn secondary" onclick="go('insights')">See why</button></div>
@@ -55,7 +55,7 @@
     <div class="tabs"><button class="active" onclick="setType(this,'EXPENSE')">Expense</button><button onclick="setType(this,'INCOME')">Income</button><button onclick="setType(this,'TRANSFER')">Transfer</button></div>
     <form class="formgrid" id="expenseForm">
       <div class="field full"><label>Amount</label><input id="amount" type="number" min="1" placeholder="₹ 0" required></div>
-      <div class="field"><label>Merchant / description</label><input id="merchant" placeholder="e.g. Swiggy" required></div>
+      <div class="field"><label>Merchant / description</label><input id="merchant" list="merchantList" placeholder="e.g. Swiggy" oninput="onMerchantInput()" required><datalist id="merchantList"></datalist></div>
       <div class="field"><label>Category</label><select id="category"><option>Food</option><option>Travel</option><option>Shopping</option><option>Groceries</option><option>Subscriptions</option><option>Bills</option><option>Rent</option><option>Entertainment</option><option>Health</option><option>Education</option><option>Others</option></select></div>
       <div class="field"><label>Account</label><select id="account"><option>Cash</option><option>HDFC Savings</option><option>ICICI Savings</option><option>Axis Credit Card</option></select></div><div class="field" id="toAccountWrap" style="display:none"><label>Transfer to</label><select id="toAccount"><option>HDFC Savings</option><option>ICICI Savings</option><option>Cash</option><option>Axis Credit Card</option></select></div>
       <div class="field"><label>Payment method</label><select id="payment"><option>UPI</option><option>Card</option><option>Cash</option><option>Bank transfer</option></select></div>
@@ -78,16 +78,18 @@
     <div class="card"><div class="muted">Savings goal progress</div><div class="amount" id="goalPct">0%</div><div class="muted" id="goalPctName">No goals yet</div></div>
   </div>
   <div class="section-title"><h2>Minto insights</h2><span class="chip purple">AI powered</span></div>
-  <div class="section-title"><h2>Budget manager</h2><button class="primary" onclick="openBudgetManager()">Edit budget</button></div>
+  <div class="section-title"><h2>Where your money goes</h2><span class="chip green">This month</span></div>
+  <div class="card" id="categoryChart"></div>
+  <div class="section-title"><h2>Budget manager</h2><button class="btn primary" onclick="openBudgetManager()">Edit budget</button></div>
 <div class="card" id="budgetManager"></div>
 <div class="section-title"><h2>Recurring expenses</h2></div><div class="card" id="recurring"></div>
   <div class="section-title"><h2>Upcoming expense forecast</h2></div>
-  <div class="card"><div style="display:flex;justify-content:space-between;gap:15px"><div><b>Expected spending this month</b><div class="muted">Based on your history and recurring commitments</div></div><strong style="font-size:21px" id="forecastAmount2">₹0</strong></div><div class="progress"><span id="forecastBar" style="width:0%"></span></div><div class="muted">Forecast uses your recent spending pace and detected recurring payments. It is an estimate, not a guarantee.</div></div>
+  <div class="card"><div style="display:flex;justify-content:space-between;gap:15px"><div><b>Expected spending this month</b><div class="muted">Based on your history and recurring commitments</div></div><strong style="font-size:21px" id="forecastAmount2">₹0</strong></div><div class="muted" style="margin-top:10px">Forecast uses your recent spending pace and detected recurring payments. It is an estimate, not a guarantee.</div></div>
   <div class="section-title"><h2>Shared money</h2><span class="chip green">Live balance</span></div>
 <div class="card" id="sharedMoney"></div>
-<div class="section-title"><h2>Notifications</h2><button class="primary" onclick="openNotificationSettings()">Manage</button></div><div class="card" id="notificationsCard"></div><div class="section-title"><h2>Smart insights</h2><span class="chip green">Based on your data</span></div>
+<div class="section-title"><h2>Notifications</h2><button class="btn primary" onclick="openNotificationSettings()">Manage</button></div><div class="card" id="notificationsCard"></div><div class="section-title"><h2>Smart insights</h2><span class="chip green">Based on your data</span></div>
 <div class="card" id="smartInsights"></div>
-<div class="section-title"><h2>Savings goals</h2><button class="primary" onclick="openGoalManager()">Add goal</button></div>
+<div class="section-title"><h2>Savings goals</h2><button class="btn primary" onclick="openGoalManager()">Add goal</button></div>
 <div class="card" id="goalsCard"></div>
 </section>
 
@@ -127,11 +129,11 @@
 
 <div class="section-title"><h2>Preferences</h2></div>
 <div class="card">
-  <div class="account"><div class="grow"><b>Notifications</b><div class="muted">Manage proactive money alerts</div></div><button class="secondary" onclick="go('insights')">Manage</button></div>
+  <div class="account"><div class="grow"><b>Notifications</b><div class="muted">Manage proactive money alerts</div></div><button class="btn secondary" onclick="go('insights')">Manage</button></div>
   <div style="height:1px;background:#F1F5F9;margin:12px 0"></div>
   <div class="account"><div class="grow"><b>Currency</b><div class="muted">Indian Rupee (INR)</div></div><span class="chip">₹</span></div>
   <div style="height:1px;background:#F1F5F9;margin:12px 0"></div>
-  <div class="account"><div class="grow"><b>Session</b><div class="muted">Sign out of Minto on this device</div></div><button class="secondary" onclick="logout()">Log out</button></div>
+  <div class="account"><div class="grow"><b>Session</b><div class="muted">Sign out of Minto on this device</div></div><button class="btn secondary" onclick="logout()">Log out</button></div>
 </div>
 
 <div class="section-title"><h2>About Minto</h2></div>
@@ -140,22 +142,18 @@
 
 </div>
 <nav class="phone-nav" aria-label="Primary navigation">
-  <button data-page="home" class="active">
-    <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3.5 10.5 12 3.5l8.5 7v9a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z"/></svg></span>
-    <span>Home</span>
-  </button>
   <button data-page="transactions">
     <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M7 4v16M7 4l-3 3M7 4l3 3M17 20V4m0 16 3-3m-3 3-3-3"/></svg></span>
     <span>Transactions</span>
+  </button>
+  <button data-page="home" class="active">
+    <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3.5 10.5 12 3.5l8.5 7v9a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z"/></svg></span>
+    <span>Home</span>
   </button>
   <button data-page="add" class="nav-add" aria-label="Add">＋</button>
   <button data-page="insights">
     <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 3l1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7zM19 16l.6 1.9L21.5 18l-1.9.6L19 20.5l-.6-1.9-1.9-.6 1.9-.6z"/></svg></span>
     <span>Insights</span>
-  </button>
-  <button data-page="profile">
-    <span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 21c.6-4 3-6 7-6s6.4 2 7 6"/></svg></span>
-    <span>Profile</span>
   </button>
 </nav>
 </main>

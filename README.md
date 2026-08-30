@@ -25,6 +25,10 @@ mock provider when no credentials are configured.
     and parsing merchant/amount/category. Disabled (and shown as "Not
     configured" in the app) until `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET`
     are set.
+  - **Email export** (`src/integrations/email/`) — "Email me a copy" on the
+    Transactions screen sends the current (filtered) CSV via any standard
+    SMTP account (`nodemailer`). Falls back to a plain browser download with
+    an explanatory toast if `SMTP_HOST`/`SMTP_USER`/`SMTP_PASS` aren't set.
 
 ## Setup
 
@@ -59,6 +63,14 @@ clearly-labeled mock/disabled fallback.
 2. Set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in `.env`.
 3. In the app, go to Profile → Connections → Connect Gmail.
 
+**Email export**
+1. Use any SMTP account — e.g. a Gmail account with an
+   [app password](https://myaccount.google.com/apppasswords), or an SMTP
+   relay from SendGrid/Mailgun/Postmark/etc.
+2. Set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` (and `SMTP_FROM` if
+   you want a custom from-address) in `.env`.
+3. In the app, go to Transactions → "Email me a copy".
+
 ## Project layout
 
 ```
@@ -70,6 +82,7 @@ src/
                          goals, shared, notifications, bootstrap, integrations)
   integrations/aa/       Bank Account Aggregator provider (Setu + mock)
   integrations/gmail/    Gmail OAuth client + email-to-transaction parser
+  integrations/email/    SMTP mailer for the "Email me a copy" CSV export
   utils/                 Shared helpers (categorization, serialization, provisioning)
   seed.ts               Demo data seed script
 prisma/schema.prisma    Data model

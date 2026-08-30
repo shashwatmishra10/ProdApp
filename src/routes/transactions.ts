@@ -3,6 +3,8 @@ import { z } from "zod";
 import { prisma } from "../db";
 import { requireAuth, AuthedRequest } from "../middleware/auth";
 import { serializeTransaction } from "../utils/serialize";
+import { isSmtpConfigured } from "../env";
+import { sendCsvEmail } from "../integrations/email/mailer";
 
 export const transactionsRouter = Router();
 transactionsRouter.use(requireAuth);
@@ -83,5 +85,22 @@ transactionsRouter.delete("/:id", async (req: AuthedRequest, res) => {
   const txn = await prisma.transaction.findFirst({ where: { id: req.params.id, userId: req.userId! } });
   if (!txn) return res.status(404).json({ error: "Not found" });
   await prisma.transaction.delete({ where: { id: txn.id } });
+  res.json({ ok: true });
+});
+
+const emailExportSchema = z.object({
+  email: z.string().email(),
+  csv: z.string().min(1).max(2_000_000),
+});
+
+// The CSV is built client-side from the user's own already-fetched transactions
+// (respecting whatever filters they had applied) and emailed as-is — no phone
+// screen has to render or download a file, which nobody does from a phone anyway.
+transactionsRouter.post("/email-export", async (req: AuthedRequest, res) => {
+  if (!isSmtpConfigured) return res.status(400).json({ error: "Email delivery is not configured yet." });
+  const parsed = emailExportSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.issues[0]?.message || "Invalid input" });
+  const filename = `minto-transactions-${new Date().toISOString().slice(0, 10)}.csv`;
+  await sendCsvEmail(parsed.data.email, parsed.data.csv, filename);
   res.json({ ok: true });
 });

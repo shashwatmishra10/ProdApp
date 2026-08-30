@@ -24,7 +24,17 @@ export const env = {
     clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
     redirectUrl: process.env.GOOGLE_REDIRECT_URL || "http://localhost:4000/api/integrations/gmail/callback",
   },
+
+  smtp: {
+    host: process.env.SMTP_HOST || "",
+    port: Number(process.env.SMTP_PORT || 587),
+    secure: bool(process.env.SMTP_SECURE, false),
+    user: process.env.SMTP_USER || "",
+    pass: process.env.SMTP_PASS || "",
+    from: process.env.SMTP_FROM || "Minto <no-reply@minto.app>",
+  },
 };
 
 export const isAAConfigured = Boolean(env.aa.clientId && env.aa.clientSecret && env.aa.provider === "setu");
 export const isGoogleConfigured = Boolean(env.google.clientId && env.google.clientSecret);
+export const isSmtpConfigured = Boolean(env.smtp.host && env.smtp.user && env.smtp.pass);
