@@ -16,6 +16,11 @@ import { integrationsRouter } from "./routes/integrations";
 
 const app = express();
 
+// Railway/Render terminate TLS at a reverse proxy in front of this app, so
+// Express needs to trust the X-Forwarded-* headers to know a request was
+// actually made over HTTPS (relevant once secure cookies are in play).
+app.set("trust proxy", 1);
+
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
