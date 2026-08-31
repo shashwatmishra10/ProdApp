@@ -29,6 +29,20 @@ const SEED_TRANSACTIONS: [string, number, string, string, string, number, string
   ["Amazon", 1250, "Shopping", "Axis Credit Card", "Card", 24, "EXPENSE"],
   ["Amazon Refund", 250, "Shopping", "Axis Credit Card", "Card", 25, "REFUND"],
   ["Uber", 320, "Travel", "ICICI Savings", "UPI", 26, "EXPENSE"],
+  ["Udemy Course", 1499, "Education", "Axis Credit Card", "Card", 9, "EXPENSE"],
+];
+
+// A few transactions tagged as if they arrived via the Bank Account
+// Aggregator or Gmail receipt capture, so the demo shows those source
+// badges in the transaction list even though no live sandbox/OAuth
+// credentials are configured for this deployment.
+const AA_TRANSACTIONS: [string, number, string, string, number, string][] = [
+  ["ATM Withdrawal", 2000, "Others", "UPI", 6, "EXPENSE"],
+  ["IMPS/UPI-Grocery Store", 845, "Groceries", "UPI", 16, "EXPENSE"],
+];
+const GMAIL_TRANSACTIONS: [string, number, string, string, number, string][] = [
+  ["Domino's Pizza", 450, "Food", "UPI", 13, "EXPENSE"],
+  ["Myntra", 1100, "Shopping", "UPI", 19, "EXPENSE"],
 ];
 
 function dayOfMonth(day: number): Date {
@@ -63,13 +77,32 @@ async function main() {
   const accountNames = ["HDFC Savings", "ICICI Savings", "Axis Credit Card"];
   const accounts: Record<string, string> = {};
   for (const name of accountNames) {
+    // HDFC Savings is the one linked via the (mocked) Account Aggregator
+    // connection below, so it shows the real "Bank-synced" state on Profile.
+    const isAALinked = name === "HDFC Savings";
     const acc = await prisma.account.create({
-      data: { userId: user.id, name, type: name.includes("Credit") ? "CREDIT_CARD" : "SAVINGS", provider: "MANUAL" },
+      data: {
+        userId: user.id,
+        name,
+        type: name.includes("Credit") ? "CREDIT_CARD" : "SAVINGS",
+        provider: isAALinked ? "AA" : "MANUAL",
+        externalRef: isAALinked ? "demo-hdfc-001" : undefined,
+      },
     });
     accounts[name] = acc.id;
   }
   const cash = await prisma.account.findUnique({ where: { userId_name: { userId: user.id, name: "Cash" } } });
   accounts["Cash"] = cash!.id;
+
+  await prisma.aAConnection.create({
+    data: {
+      userId: user.id,
+      provider: "mock",
+      consentId: "demo-consent",
+      status: "ACTIVE",
+      lastSyncAt: new Date(),
+    },
+  });
 
   for (const [merchant, amount, category, account, payment, day, type] of SEED_TRANSACTIONS) {
     await prisma.transaction.create({
@@ -103,6 +136,40 @@ async function main() {
     },
   });
 
+  for (const [merchant, amount, category, payment, day, type] of AA_TRANSACTIONS) {
+    await prisma.transaction.create({
+      data: {
+        userId: user.id, accountId: accounts["HDFC Savings"], merchant, amount, category, type,
+        payment, date: dayOfMonth(day), source: "AA", recurring: false,
+      },
+    });
+  }
+  for (const [merchant, amount, category, payment, day, type] of GMAIL_TRANSACTIONS) {
+    await prisma.transaction.create({
+      data: {
+        userId: user.id, accountId: accounts["Cash"], merchant, amount, category, type,
+        payment, date: dayOfMonth(day), source: "GMAIL", recurring: false,
+      },
+    });
+  }
+
+  // A transfer between accounts, to show that transaction type too.
+  const transferDate = dayOfMonth(7);
+  await prisma.transaction.create({
+    data: {
+      userId: user.id, accountId: accounts["HDFC Savings"], merchant: "Move to Cash", amount: 3000,
+      category: "Others", type: "TRANSFER", payment: "Bank transfer", date: transferDate,
+      source: "MANUAL", recurring: false, transferSide: "OUT",
+    },
+  });
+  await prisma.transaction.create({
+    data: {
+      userId: user.id, accountId: accounts["Cash"], merchant: "Move to Cash", amount: 3000,
+      category: "Others", type: "TRANSFER", payment: "Bank transfer", date: transferDate,
+      source: "MANUAL", recurring: false, transferSide: "IN",
+    },
+  });
+
   await prisma.goal.createMany({
     data: [
       { userId: user.id, name: "Emergency Fund", target: 100000, saved: 45000, icon: "🛟" },
@@ -121,6 +188,21 @@ async function main() {
           { name: "You", share: 800, paid: 2400, settled: true },
           { name: "Rahul", share: 800, paid: 0, settled: false },
           { name: "Priya", share: 800, paid: 0, settled: false },
+        ],
+      },
+    },
+  });
+  await prisma.sharedGroup.create({
+    data: {
+      userId: user.id,
+      name: "Movie Night",
+      date: dayOfMonth(20),
+      status: "SETTLED",
+      participants: {
+        create: [
+          { name: "You", share: 400, paid: 1200, settled: true },
+          { name: "Rahul", share: 400, paid: 400, settled: true },
+          { name: "Priya", share: 400, paid: 400, settled: true },
         ],
       },
     },

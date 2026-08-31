@@ -282,7 +282,7 @@ function renderTransactions() {
   if (controls) controls.innerHTML = `
     <div class="search-box"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="txnSearch" placeholder="Search merchant, category or note" value="${escapeHtml(txnFilters.query)}"></div>
     <div class="filter-row" style="margin-top:8px">${["ALL", "EXPENSE", "INCOME", "TRANSFER", "REFUND"].map((x) => `<button class="filter-pill ${txnFilters.type === x ? "active" : ""}" onclick="setTxnFilter('type','${x}')">${x === "ALL" ? "All" : x[0] + x.slice(1).toLowerCase()}</button>`).join("")}</div>
-    <div class="filter-row" style="margin-top:7px">${["ALL", ...categories].map((x) => `<button class="filter-pill ${txnFilters.category === x ? "active" : ""}" onclick="setTxnFilter('category',${JSON.stringify(x)})">${escapeHtml(x === "ALL" ? "All categories" : x)}</button>`).join("")}</div>
+    <div class="filter-row" style="margin-top:7px">${categories.map((x) => `<button class="filter-pill ${txnFilters.category === x ? "active" : ""}" onclick="setTxnFilter('category',${JSON.stringify(x)})">${escapeHtml(x)}</button>`).join("")}</div>
     <div class="filter-row" style="margin-top:7px"><button class="filter-pill ${txnFilters.date === "ALL" ? "active" : ""}" onclick="setTxnFilter('date','ALL')">All time</button><button class="filter-pill ${txnFilters.date === "MONTH" ? "active" : ""}" onclick="setTxnFilter('date','MONTH')">This month</button><button class="filter-pill ${txnFilters.date === "CUSTOM" ? "active" : ""}" onclick="openDateRangeFilter()"><svg viewBox="0 0 24 24" style="width:11px;height:11px;vertical-align:-1px;margin-right:3px"><rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 9h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>${txnFilters.date === "CUSTOM" ? customRangeLabel() : "Custom range"}</button>${accounts.map((x) => `<button class="filter-pill ${txnFilters.account === x ? "active" : ""}" onclick="setTxnFilter('account',${JSON.stringify(x)})">${escapeHtml(x)}</button>`).join("")}</div>
     <div class="export-row">
       <button class="btn secondary" onclick="openEmailExport()"><svg viewBox="0 0 24 24"><path d="M4 6h16v12H4zM4 6l8 7 8-7"/></svg>Email me a copy</button>
@@ -454,7 +454,7 @@ document.getElementById("expenseForm").addEventListener("submit", async (e) => {
 function renderSmartInsights() {
   const el = document.getElementById("smartInsights"); if (!el) return;
   const list = smartInsights();
-  el.innerHTML = list.length ? list.map((x) => `<div class="insight"><div class="insight-icon">${x.icon}</div><div class="grow"><b>${escapeHtml(x.title)}</b><p>${escapeHtml(x.text)}</p><button class="insight-action">${escapeHtml(x.action)} →</button></div></div>`).join("") : '<div class="muted">Keep using Minto and smart insights will appear as patterns emerge.</div>';
+  el.innerHTML = list.length ? list.map((x) => `<div class="insight-row"><div class="insight-icon">${x.icon}</div><div class="grow"><b>${escapeHtml(x.title)}</b><p>${escapeHtml(x.text)}</p><button class="insight-action">${escapeHtml(x.action)} →</button></div></div>`).join("") : '<div class="muted">Keep using Minto and smart insights will appear as patterns emerge.</div>';
 }
 function alertListHtml(list) {
   return list.length
